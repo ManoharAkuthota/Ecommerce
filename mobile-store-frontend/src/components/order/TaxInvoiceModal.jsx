@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   Smartphone,
+  Info,
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -93,27 +94,66 @@ const TaxInvoiceModal = ({ isOpen, onClose, order }) => {
   const state = shipping.state || order.state || 'Telangana';
   const postalCode = shipping.postalCode || order.postalCode || '500081';
 
-  // 1. Download PDF using html2canvas & jsPDF
+  // 1. Download PDF using html2canvas & jsPDF with locked desktop A4 resolution
   const handleDownloadPdf = async () => {
     if (!invoiceRef.current || isGeneratingPdf) return;
     setIsGeneratingPdf(true);
 
     try {
       const element = invoiceRef.current;
+      
+      // Render clean canvas with desktop A4 width (800px) regardless of current device screen size
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 2.5,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
+        windowWidth: 1200,
+        onclone: (clonedDoc) => {
+          const sheet = clonedDoc.getElementById('tax-invoice-sheet');
+          if (sheet) {
+            sheet.style.width = '800px';
+            sheet.style.minWidth = '800px';
+            sheet.style.maxWidth = '800px';
+            sheet.style.padding = '36px 40px';
+            sheet.style.margin = '0 auto';
+            sheet.style.boxSizing = 'border-box';
+            sheet.style.transform = 'none';
+            sheet.style.borderRadius = '0px';
+            sheet.style.boxShadow = 'none';
+            sheet.style.border = 'none';
+          }
+        },
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, Math.min(imgHeight, pageHeight));
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 10;
+      const maxContentWidth = pageWidth - (margin * 2); // 190mm
+      const maxContentHeight = pageHeight - (margin * 2); // 277mm
+
+      let imgWidth = maxContentWidth;
+      let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // If content is taller than available single page height, scale down proportionally so NO distortion occurs
+      if (imgHeight > maxContentHeight) {
+        const ratio = maxContentHeight / imgHeight;
+        imgHeight = maxContentHeight;
+        imgWidth = imgWidth * ratio;
+      }
+
+      // Center on page with clean margins
+      const xPos = (pageWidth - imgWidth) / 2;
+      const yPos = Math.max(margin, (pageHeight - imgHeight) / 2);
+
+      pdf.addImage(imgData, 'JPEG', xPos, yPos, imgWidth, imgHeight, undefined, 'FAST');
       pdf.save(`${invoiceNumber}.pdf`);
     } catch (err) {
       console.error('Error generating PDF invoice:', err);
@@ -145,42 +185,55 @@ const TaxInvoiceModal = ({ isOpen, onClose, order }) => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 16 }}
           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-4xl bg-dark-900 border border-dark-700/80 rounded-3xl shadow-2xl overflow-hidden z-10 my-4 sm:my-8 print:border-none print:shadow-none print:rounded-none print:m-0 print:p-0"
+          className="relative w-full max-w-4xl bg-dark-900 border border-dark-700/80 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden z-10 my-2 sm:my-8 print:border-none print:shadow-none print:rounded-none print:m-0 print:p-0"
         >
           {/* Top Floating Control Bar */}
-          <div className="px-6 py-4 border-b border-dark-800 bg-dark-850/90 flex items-center justify-between gap-4 print:hidden">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-accent-500/10 border border-accent-500/30 flex items-center justify-center text-accent-400">
-                <FileText className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  Official GST Tax Invoice
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                    GST Compliant
+          <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-dark-800 bg-dark-850/95 flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden">
+            <div className="flex items-center justify-between sm:justify-start gap-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-accent-500/10 border border-accent-500/30 flex items-center justify-center text-accent-400 shrink-0">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                    <span>GST Tax Invoice</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                      HSN 8517
+                    </span>
+                  </h3>
+                  <span className="text-[10px] sm:text-[11px] font-mono text-neutral-400 block">
+                    {invoiceNumber}
                   </span>
-                </h3>
-                <span className="text-[11px] font-mono text-neutral-400">
-                  {invoiceNumber}
-                </span>
+                </div>
               </div>
+
+              {/* Close Button on Mobile (top right) */}
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-800 transition-colors sm:hidden"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2 self-stretch sm:self-auto">
               <button
                 type="button"
                 onClick={handlePrint}
-                className="px-3.5 py-2 rounded-xl bg-dark-800 hover:bg-dark-750 text-neutral-200 hover:text-white border border-dark-700 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+                className="flex-1 sm:flex-none px-3 sm:px-3.5 py-2 rounded-xl bg-dark-800 hover:bg-dark-750 text-neutral-200 hover:text-white border border-dark-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Print Invoice</span>
+                <span>Print</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleDownloadPdf}
                 disabled={isGeneratingPdf}
-                className="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-glow-sm disabled:opacity-50"
+                className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-glow-sm disabled:opacity-50"
               >
                 {isGeneratingPdf ? (
                   <>
@@ -195,22 +248,33 @@ const TaxInvoiceModal = ({ isOpen, onClose, order }) => {
                 )}
               </button>
 
+              {/* Close button on desktop */}
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-800 transition-colors ml-1"
+                className="hidden sm:flex p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-800 transition-colors ml-1"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* Printable Parchment A4 Sheet */}
-          <div className="p-3 sm:p-6 overflow-y-auto max-h-[80vh] print:max-h-none print:overflow-visible print:p-0 bg-neutral-900/50">
+          {/* Printable Parchment A4 Sheet Viewer */}
+          <div className="p-2 sm:p-6 overflow-x-auto overflow-y-auto max-h-[75vh] sm:max-h-[80vh] print:max-h-none print:overflow-visible print:p-0 bg-neutral-900/60">
+            {/* Mobile swipe helper hint */}
+            <div className="sm:hidden mb-2 px-3 py-1.5 rounded-xl bg-dark-800/80 border border-dark-700/60 text-neutral-400 text-[10px] flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Info className="w-3 h-3 text-accent-400 shrink-0" />
+                Swipe horizontally to inspect full A4 sheet
+              </span>
+              <span className="font-mono text-accent-400 font-bold">100% Legal</span>
+            </div>
+
             <div
               ref={invoiceRef}
               id="tax-invoice-sheet"
-              className="bg-white text-neutral-900 p-6 sm:p-10 rounded-2xl shadow-xl max-w-[800px] mx-auto text-[11px] font-sans leading-relaxed border border-neutral-200 print:border-none print:shadow-none print:rounded-none print:max-w-none print:w-full"
+              className="bg-white text-neutral-900 p-6 sm:p-10 rounded-xl sm:rounded-2xl shadow-xl w-[740px] sm:w-full max-w-[800px] mx-auto text-[11px] font-sans leading-relaxed border border-neutral-200 print:border-none print:shadow-none print:rounded-none print:max-w-none print:w-full select-text"
             >
               {/* Header Title & Original Recipient */}
               <div className="border-b-2 border-neutral-900 pb-3 flex items-start justify-between gap-4">
