@@ -9,23 +9,37 @@
 
 import { axiosClient } from './axiosClient';
 
+// In-memory cache for ultra-fast mobile navigation
+let cachedLatestMobiles = null;
+let lastLatestMobilesTime = 0;
+let cachedFeaturedReviews = null;
+let lastFeaturedReviewsTime = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 export const homeService = {
   /**
-   * Fetch the top 8 latest visible flagship smartphones for the homepage showcase
+   * Fetch top 8 latest visible flagship smartphones with in-memory caching
    * Endpoint: GET /api/mobiles/latest
-   * 
-   * @returns {Promise<Array>} Array of MobileResponse objects
    */
-  getLatestMobiles: async () => {
+  getLatestMobiles: async (forceRefresh = false) => {
+    const now = Date.now();
+    if (!forceRefresh && cachedLatestMobiles && (now - lastLatestMobilesTime < CACHE_TTL_MS)) {
+      return cachedLatestMobiles;
+    }
     const response = await axiosClient.get('/mobiles/latest');
+    cachedLatestMobiles = response.data;
+    lastLatestMobilesTime = Date.now();
     return response.data;
   },
 
   /**
-   * Fetch the latest customer reviews for the testimonial marquee
+   * Return synchronously cached latest mobiles without network delay if available
+   */
+  getCachedLatestMobiles: () => cachedLatestMobiles,
+
+  /**
+   * Fetch the latest customer reviews
    * Endpoint: GET /api/reviews/latest
-   * 
-   * @returns {Promise<Array>} Array of ReviewResponse objects
    */
   getLatestReviews: async () => {
     const response = await axiosClient.get('/reviews/latest');
@@ -33,13 +47,17 @@ export const homeService = {
   },
 
   /**
-   * Fetch featured customer reviews for the marquee showcase
+   * Fetch featured customer reviews with in-memory caching
    * Endpoint: GET /api/reviews/featured
-   * 
-   * @returns {Promise<Array>} Array of featured ReviewResponse objects
    */
-  getFeaturedReviews: async () => {
+  getFeaturedReviews: async (forceRefresh = false) => {
+    const now = Date.now();
+    if (!forceRefresh && cachedFeaturedReviews && (now - lastFeaturedReviewsTime < CACHE_TTL_MS)) {
+      return cachedFeaturedReviews;
+    }
     const response = await axiosClient.get('/reviews/featured');
+    cachedFeaturedReviews = response.data;
+    lastFeaturedReviewsTime = Date.now();
     return response.data;
   },
 };

@@ -53,7 +53,12 @@ export const RelatedProductCard = ({ mobile }) => {
           </span>
         </div>
 
-        <div className="relative w-full aspect-[4/3.2] rounded-2xl overflow-hidden bg-dark-950/80 border border-dark-800/60 flex items-center justify-center p-3">
+        <Link
+          to={`/mobiles/${id}`}
+          state={{ mobile }}
+          aria-label={`View details for ${brand} ${name}`}
+          className="block relative w-full aspect-[4/3.2] rounded-2xl overflow-hidden bg-dark-950/80 border border-dark-800/60 flex items-center justify-center p-3 cursor-pointer"
+        >
           {imageUrl && !imageError ? (
             <img
               src={imageUrl}
@@ -65,7 +70,7 @@ export const RelatedProductCard = ({ mobile }) => {
           ) : (
             <Smartphone className="w-12 h-12 text-neutral-600 group-hover:text-accent-400 transition-colors" />
           )}
-        </div>
+        </Link>
       </div>
 
       {/* Content & Action */}
@@ -74,9 +79,15 @@ export const RelatedProductCard = ({ mobile }) => {
           <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent-400 block">
             {brand}
           </span>
-          <h3 className="text-sm sm:text-base font-bold text-white tracking-tight mt-0.5 group-hover:text-accent-300 transition-colors line-clamp-1">
-            {name}
-          </h3>
+          <Link
+            to={`/mobiles/${id}`}
+            state={{ mobile }}
+            className="block group-hover:text-accent-300 transition-colors"
+          >
+            <h3 className="text-sm sm:text-base font-bold text-white tracking-tight mt-0.5 line-clamp-1">
+              {name}
+            </h3>
+          </Link>
         </div>
 
         <div className="pt-3 border-t border-dark-850 flex items-center justify-between gap-2">
@@ -86,6 +97,7 @@ export const RelatedProductCard = ({ mobile }) => {
 
           <Link
             to={`/mobiles/${id}`}
+            state={{ mobile }}
             aria-label={`View details for ${name}`}
             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-dark-800 hover:bg-accent-600 border border-dark-700/80 hover:border-accent-500 transition-all duration-200"
           >

@@ -115,8 +115,13 @@ export const MobileCard = ({ mobile }) => {
           </div>
         </div>
 
-        {/* Product Image Frame */}
-        <div className="relative w-full aspect-[4/3.4] rounded-2xl overflow-hidden bg-dark-950/80 border border-dark-800/60 flex items-center justify-center p-3">
+        {/* Product Image Frame (Clickable / Touch-friendly) */}
+        <Link
+          to={targetUrl}
+          state={{ mobile }}
+          aria-label={`View details for ${brand} ${name}`}
+          className="block relative w-full aspect-[4/3.4] rounded-2xl overflow-hidden bg-dark-950/80 border border-dark-800/60 flex items-center justify-center p-3 cursor-pointer"
+        >
           {imageUrl && !imageError ? (
             <img
               src={imageUrl}
@@ -136,7 +141,7 @@ export const MobileCard = ({ mobile }) => {
 
           {/* Subtle Dark Bottom Gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-dark-900/40 via-transparent to-transparent pointer-events-none" />
-        </div>
+        </Link>
       </div>
 
       {/* Content & Specs Area */}
@@ -146,9 +151,15 @@ export const MobileCard = ({ mobile }) => {
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-accent-400 block">
             {brand}
           </span>
-          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight mt-1 group-hover:text-accent-300 transition-colors line-clamp-1">
-            {name}
-          </h3>
+          <Link
+            to={targetUrl}
+            state={{ mobile }}
+            className="block group-hover:text-accent-300 transition-colors"
+          >
+            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight mt-1 line-clamp-1">
+              {name}
+            </h3>
+          </Link>
 
           {/* Specs Micro-Chips */}
           <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400">
@@ -184,6 +195,7 @@ export const MobileCard = ({ mobile }) => {
 
           <Link
             to={targetUrl}
+            state={{ mobile }}
             aria-label={`View details for ${name}`}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-dark-800 hover:bg-accent-600 border border-dark-700/80 hover:border-accent-500 transition-all duration-200 shadow-sm hover:shadow-glow-sm"
           >

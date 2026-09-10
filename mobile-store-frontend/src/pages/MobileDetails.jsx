@@ -12,7 +12,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, Home as HomeIcon } from 'lucide-react';
 import { mobileDetailsService } from '../services/mobileDetailsService';
@@ -29,29 +29,38 @@ import {
 
 export const MobileDetails = () => {
   const { id } = useParams();
-  const [mobile, setMobile] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
+
+  // Instant zero-delay load from navigation state or in-memory cache
+  const initialMobile = location.state?.mobile || mobileDetailsService.getCachedMobile(id);
+  const [mobile, setMobile] = useState(initialMobile);
+  const [isLoading, setIsLoading] = useState(!initialMobile);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchMobile = async () => {
       if (!id) return;
-      setIsLoading(true);
+
+      // Only show full skeleton if we have zero cached data to display
+      if (!mobile) {
+        setIsLoading(true);
+      }
       setError(null);
 
       // Scroll to top immediately when viewing a new product
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'instant' });
 
       try {
         const data = await mobileDetailsService.getMobileById(id);
-        setMobile(data);
         if (data) {
+          setMobile(data);
           recentService.addRecent(data);
         }
       } catch (err) {
         console.error('Error fetching smartphone details:', err);
-        setError(err.response?.status === 404 ? 'not_found' : 'server_error');
-        setMobile(null);
+        if (!mobile) {
+          setError(err.response?.status === 404 ? 'not_found' : 'server_error');
+        }
       } finally {
         setIsLoading(false);
       }
