@@ -112,6 +112,18 @@ public class MobileController {
     }
 
     /**
+     * GET /api/mobiles/brands
+     * Retrieve list of distinct smartphone brands.
+     *
+     * @return HTTP 200 with list of brand names
+     */
+    @GetMapping("/brands")
+    public ResponseEntity<List<String>> getDistinctBrands() {
+        log.info("REST request to fetch distinct smartphone brands");
+        return ResponseEntity.ok(mobileService.getFilterBrands());
+    }
+
+    /**
      * GET /api/mobiles/{id}
      * Retrieve a specific smartphone by its UUID.
      * Returns HTTP 404 if product does not exist.
