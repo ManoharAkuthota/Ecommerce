@@ -38,10 +38,7 @@ services:
     staticPublishPath: ./mobile-store-frontend/dist
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: ms-mobiles-backend
-          property: host
+        value: https://ms-mobiles-backend.onrender.com/api
     routes:
       - type: rewrite
         source: /*

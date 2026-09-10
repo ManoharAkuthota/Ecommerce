@@ -11,9 +11,19 @@ import axios from 'axios';
 import { tokenStorage } from '../utils/tokenStorage';
 import { isTokenExpired } from '../utils/jwtUtils';
 
-const rawBase =
-  (typeof import.meta !== 'undefined' && (import.meta?.env?.VITE_API_BASE_URL || import.meta?.env?.VITE_API_URL)) ||
-  'http://localhost:8080/api';
+const getEffectiveApiBase = () => {
+  const envUrl = typeof import.meta !== 'undefined' && (import.meta?.env?.VITE_API_BASE_URL || import.meta?.env?.VITE_API_URL);
+  if (envUrl && envUrl.trim() && !envUrl.includes('localhost')) {
+    return envUrl.trim();
+  }
+  // If running in browser on cloud (Render / Vercel / Netlify / custom domain)
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return 'https://ms-mobiles-backend.onrender.com/api';
+  }
+  return envUrl || 'http://localhost:8080/api';
+};
+
+const rawBase = getEffectiveApiBase();
 
 const getNormalizedApiBase = () => {
   let url = (rawBase || '').trim();
