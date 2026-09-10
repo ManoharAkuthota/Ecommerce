@@ -17,6 +17,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.mobilestore.chat.entity.ChatMessage;
+import com.mobilestore.chat.repository.ChatMessageRepository;
+import com.mobilestore.order.entity.Order;
+import com.mobilestore.order.entity.OrderItem;
+import com.mobilestore.order.entity.enums.DeliveryType;
+import com.mobilestore.order.entity.enums.OrderStatus;
+import com.mobilestore.order.entity.enums.PaymentMethod;
+import com.mobilestore.order.entity.enums.PaymentStatus;
+import com.mobilestore.order.repository.OrderRepository;
+import com.mobilestore.wishlist.entity.Wishlist;
+import com.mobilestore.wishlist.repository.WishlistRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +42,9 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
     private final MobileRepository mobileRepository;
+    private final OrderRepository orderRepository;
+    private final WishlistRepository wishlistRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final ReviewRepository reviewRepository;
     private final ContactMessageRepository contactMessageRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,6 +56,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedAdmin();
             seedUser();
             seedMobiles();
+            seedCustomerData();
             seedReviews();
             seedContactMessages();
         } catch (Exception e) {
@@ -239,6 +254,143 @@ public class DatabaseSeeder implements CommandLineRunner {
                             .build()
             ));
             log.info("Seeded verified customer reviews");
+        }
+    }
+
+    private void seedCustomerData() {
+        User customer = userRepository.findByEmailIgnoreCase("user@antigravity.com").orElse(null);
+        if (customer == null) return;
+
+        List<Mobile> mobiles = mobileRepository.findAll();
+        if (mobiles.isEmpty()) return;
+
+        // 1. Seed Customer Wishlist (3 items)
+        if (wishlistRepository.countByUser(customer) == 0) {
+            for (int i = 0; i < Math.min(3, mobiles.size()); i++) {
+                Mobile m = mobiles.get(i);
+                wishlistRepository.save(Wishlist.builder()
+                        .user(customer)
+                        .mobile(m)
+                        .build());
+            }
+            log.info("Seeded 3 wishlist flagships for Customer user@antigravity.com");
+        }
+
+        // 2. Seed Customer Orders (1 in-transit, 1 delivered)
+        if (orderRepository.findByUserOrderByCreatedAtDesc(customer).isEmpty()) {
+            Mobile phone1 = mobiles.size() > 1 ? mobiles.get(1) : mobiles.get(0); // Samsung Galaxy S25 Ultra
+            Mobile phone2 = mobiles.size() > 2 ? mobiles.get(2) : mobiles.get(0); // OnePlus 13
+
+            String img1 = phone1.getImages().isEmpty() ? null : phone1.getImages().get(0).getImageUrl();
+            String img2 = phone2.getImages().isEmpty() ? null : phone2.getImages().get(0).getImageUrl();
+
+            // Order 1: Active In-Transit (SHIPPED)
+            Order order1 = Order.builder()
+                    .orderNumber("ORD-2026-98124")
+                    .user(customer)
+                    .orderStatus(OrderStatus.SHIPPED)
+                    .paymentStatus(PaymentStatus.PAID)
+                    .paymentMethod(PaymentMethod.UPI)
+                    .deliveryType(DeliveryType.STANDARD_DELIVERY)
+                    .subtotal(phone1.getPrice())
+                    .taxAmount(BigDecimal.ZERO)
+                    .shippingFee(BigDecimal.ZERO)
+                    .discountAmount(BigDecimal.ZERO)
+                    .totalAmount(phone1.getPrice())
+                    .recipientName(customer.getFullName())
+                    .recipientPhone(customer.getPhoneNumber())
+                    .recipientEmail(customer.getEmail())
+                    .addressLine1("Flat 402, Prestige Silicon Oasis")
+                    .addressLine2("Electronic City Phase 1")
+                    .city("Bengaluru")
+                    .state("Karnataka")
+                    .postalCode("560100")
+                    .carrier("BlueDart Express")
+                    .trackingNumber("BLUEDART-88492019")
+                    .notes("Please call recipient before doorstep delivery.")
+                    .build();
+
+            OrderItem item1 = OrderItem.builder()
+                    .mobile(phone1)
+                    .mobileName(phone1.getName())
+                    .mobileBrand(phone1.getBrand())
+                    .mobileImage(img1)
+                    .ram(phone1.getRam())
+                    .storage(phone1.getStorage())
+                    .unitPrice(phone1.getPrice())
+                    .quantity(1)
+                    .totalPrice(phone1.getPrice())
+                    .build();
+            order1.addItem(item1);
+            orderRepository.save(order1);
+
+            // Order 2: Completed (DELIVERED)
+            Order order2 = Order.builder()
+                    .orderNumber("ORD-2026-77319")
+                    .user(customer)
+                    .orderStatus(OrderStatus.DELIVERED)
+                    .paymentStatus(PaymentStatus.PAID)
+                    .paymentMethod(PaymentMethod.CARD)
+                    .deliveryType(DeliveryType.STANDARD_DELIVERY)
+                    .subtotal(phone2.getPrice())
+                    .taxAmount(BigDecimal.ZERO)
+                    .shippingFee(BigDecimal.ZERO)
+                    .discountAmount(BigDecimal.ZERO)
+                    .totalAmount(phone2.getPrice())
+                    .recipientName(customer.getFullName())
+                    .recipientPhone(customer.getPhoneNumber())
+                    .recipientEmail(customer.getEmail())
+                    .addressLine1("Flat 402, Prestige Silicon Oasis")
+                    .addressLine2("Electronic City Phase 1")
+                    .city("Bengaluru")
+                    .state("Karnataka")
+                    .postalCode("560100")
+                    .carrier("Delhivery Surface")
+                    .trackingNumber("DLV-99382710")
+                    .build();
+
+            OrderItem item2 = OrderItem.builder()
+                    .mobile(phone2)
+                    .mobileName(phone2.getName())
+                    .mobileBrand(phone2.getBrand())
+                    .mobileImage(img2)
+                    .ram(phone2.getRam())
+                    .storage(phone2.getStorage())
+                    .unitPrice(phone2.getPrice())
+                    .quantity(1)
+                    .totalPrice(phone2.getPrice())
+                    .build();
+            order2.addItem(item2);
+            orderRepository.save(order2);
+
+            log.info("Seeded 2 orders for customer user@antigravity.com");
+        }
+
+        // 3. Seed Support Concierge Dialogue
+        if (chatMessageRepository.findByUserOrderByCreatedAtAsc(customer).isEmpty()) {
+            chatMessageRepository.saveAll(List.of(
+                    ChatMessage.builder()
+                            .user(customer)
+                            .senderRole("CUSTOMER")
+                            .senderName(customer.getFullName())
+                            .senderEmail(customer.getEmail())
+                            .message("Hello! Can you confirm when my Galaxy S25 Ultra order ORD-2026-98124 will arrive?")
+                            .channel("SUPPORT")
+                            .isReadByCustomer(true)
+                            .isReadByAdmin(true)
+                            .build(),
+                    ChatMessage.builder()
+                            .user(customer)
+                            .senderRole("ADMIN")
+                            .senderName("MS Concierge Support")
+                            .senderEmail("admin@antigravity.com")
+                            .message("Hello Customer! Your Galaxy S25 Ultra is in transit via BlueDart Express (Tracking: BLUEDART-88492019). Delivery is scheduled for tomorrow between 10:00 AM - 1:00 PM.")
+                            .channel("SUPPORT")
+                            .isReadByCustomer(false)
+                            .isReadByAdmin(true)
+                            .build()
+            ));
+            log.info("Seeded concierge inquiry dialogue for user@antigravity.com");
         }
     }
 
