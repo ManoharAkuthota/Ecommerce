@@ -76,24 +76,24 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden overflow-hidden touch-manipulation">
-          {/* Backdrop Overlay - Explicitly behind the drawer with z-40 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
+        <motion.div
+          key="user-mobile-sidebar-root"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 lg:hidden overflow-hidden"
+        >
+          {/* Backdrop Overlay */}
+          <div
             onClick={onClose}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              onClose();
-            }}
             aria-hidden="true"
-            className="fixed inset-0 bg-black/75 cursor-pointer z-40"
+            className="fixed inset-0 bg-black/75 cursor-pointer z-40 transition-opacity"
           />
 
-          {/* Slide-out Drawer Panel - Explicitly fixed with z-50 above backdrop */}
+          {/* Slide-out Drawer Panel */}
           <motion.aside
+            key="user-mobile-sidebar-drawer"
             variants={drawerVariants}
             initial="closed"
             animate="open"
@@ -101,7 +101,7 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
             role="dialog"
             aria-modal="true"
             aria-label="Customer Mobile Navigation Menu"
-            className="fixed inset-y-0 left-0 z-50 w-[84%] max-w-xs h-full bg-dark-900 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-5 overflow-y-auto overscroll-contain touch-manipulation select-none"
+            className="fixed inset-y-0 left-0 z-50 w-[84%] max-w-xs h-full bg-dark-900 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-5 overflow-y-auto overscroll-contain select-none"
           >
             {/* TOP: Header Branding & Close Button */}
             <div>
@@ -127,12 +127,8 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  onTouchEnd={(e) => {
-                    e.stopPropagation();
-                    onClose();
-                  }}
                   aria-label="Close mobile navigation menu"
-                  className="p-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-800 border border-dark-800 focus:outline-none transition-colors active:bg-dark-750 active:scale-95 touch-manipulation"
+                  className="p-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-800 border border-dark-800 focus:outline-none transition-colors active:bg-dark-750 active:scale-95"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -231,7 +227,7 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
               />
             </div>
           </motion.aside>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

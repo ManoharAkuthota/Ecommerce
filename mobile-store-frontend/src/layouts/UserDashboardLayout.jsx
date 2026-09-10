@@ -11,7 +11,7 @@
  * - Dedicated subroute outlet for modular account pages
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import UserSidebar from '../components/account/UserSidebar';
 import UserMobileSidebar from '../components/account/UserMobileSidebar';
@@ -30,6 +30,14 @@ const UserDashboardLayout = () => {
   // Mobile drawer open state (<1024px)
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
+  const location = useLocation();
+  const isChatPage = location.pathname.startsWith('/account/inquiries');
+
+  // Ensure mobile drawer is closed on any route transition
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
+
   const handleToggleCollapse = () => {
     setIsCollapsed((prev) => {
       const next = !prev;
@@ -41,9 +49,6 @@ const UserDashboardLayout = () => {
       return next;
     });
   };
-
-  const location = useLocation();
-  const isChatPage = location.pathname.startsWith('/account/inquiries');
 
   return (
     <div

@@ -44,6 +44,11 @@ const MobileMenu = ({
     };
   }, [isOpen]);
 
+  // Close menu automatically on route change
+  useEffect(() => {
+    onClose();
+  }, [currentPath]);
+
   // Drawer animation variants
   const drawerVariants = {
     closed: {
@@ -59,24 +64,24 @@ const MobileMenu = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 md:hidden overflow-hidden touch-manipulation">
-          {/* Backdrop overlay - Explicitly behind the drawer with z-40 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
+        <motion.div
+          key="mobile-menu-root"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 md:hidden overflow-hidden"
+        >
+          {/* Backdrop overlay */}
+          <div
             onClick={onClose}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              onClose();
-            }}
             aria-hidden="true"
-            className="fixed inset-0 bg-black/75 cursor-pointer z-40"
+            className="fixed inset-0 bg-black/75 cursor-pointer z-40 transition-opacity"
           />
 
           {/* Slide-in Drawer - Explicitly fixed with z-50 above backdrop */}
           <motion.aside
+            key="mobile-menu-drawer"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile Navigation Menu"
@@ -107,10 +112,6 @@ const MobileMenu = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  onTouchEnd={(e) => {
-                    e.stopPropagation();
-                    onClose();
-                  }}
                   aria-label="Close navigation menu"
                   className="p-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-900 border border-dark-800 transition-colors active:bg-dark-800 active:scale-95 touch-manipulation focus:outline-none"
                 >
@@ -150,10 +151,7 @@ const MobileMenu = ({
             </div>
 
             {/* Bottom Actions */}
-            <motion.div
-              variants={itemVariants}
-              className="pt-6 border-t border-dark-800/80 space-y-3"
-            >
+            <div className="pt-6 border-t border-dark-800/80 space-y-3">
               {/* Customer Account Button (Mobile) */}
               {!isCustomerAuth ? (
                 <Link to="/login" onClick={onClose}>
@@ -212,9 +210,9 @@ const MobileMenu = ({
               <p className="text-[11px] text-center text-neutral-500 tracking-wide">
                 Flagship eCommerce Experience
               </p>
-            </motion.div>
+            </div>
           </motion.aside>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

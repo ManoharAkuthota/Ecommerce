@@ -90,24 +90,24 @@ const MobileSidebar = ({ isOpen, onClose }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden overflow-hidden touch-manipulation">
-          {/* Backdrop Overlay - Explicitly behind the drawer with z-40 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
+        <motion.div
+          key="admin-mobile-sidebar-root"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 lg:hidden overflow-hidden"
+        >
+          {/* Backdrop Overlay */}
+          <div
             onClick={onClose}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              onClose();
-            }}
             aria-hidden="true"
-            className="fixed inset-0 bg-black/75 cursor-pointer z-40"
+            className="fixed inset-0 bg-black/75 cursor-pointer z-40 transition-opacity"
           />
 
           {/* Slide-in Drawer Container - Explicitly fixed with z-50 above backdrop */}
           <motion.aside
+            key="admin-mobile-sidebar-drawer"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile Navigation Menu"
@@ -115,7 +115,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             initial="closed"
             animate="open"
             exit="closed"
-            className="fixed inset-y-0 left-0 z-50 w-[84%] max-w-[300px] h-full bg-dark-950 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none touch-manipulation"
+            className="fixed inset-y-0 left-0 z-50 w-[84%] max-w-[300px] h-full bg-dark-950 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none"
           >
             {/* TOP: Header Branding & Close Button */}
             <div>
@@ -141,10 +141,6 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  onTouchEnd={(e) => {
-                    e.stopPropagation();
-                    onClose();
-                  }}
                   aria-label="Close navigation drawer"
                   className="p-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-900 border border-dark-800 transition-colors active:bg-dark-800 active:scale-95 touch-manipulation focus:outline-none"
                 >
@@ -194,10 +190,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             </div>
 
             {/* BOTTOM: Admin Card, Storefront Link, and Logout */}
-            <motion.div
-              variants={itemVariants}
-              className="pt-6 border-t border-dark-800/80 space-y-3"
-            >
+            <div className="pt-6 border-t border-dark-800/80 space-y-3">
               {/* Admin profile pill */}
               <div className="p-3 rounded-2xl bg-dark-900/80 border border-dark-800 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-accent-600 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-glow-sm flex-shrink-0">
@@ -230,9 +223,9 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 fullWidth={true}
                 label="Sign Out of Console"
               />
-            </motion.div>
+            </div>
           </motion.aside>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
