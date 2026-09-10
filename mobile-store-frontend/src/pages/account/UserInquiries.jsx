@@ -47,6 +47,7 @@ import {
   ExternalLink,
   Search,
   ArrowLeft,
+  LayoutDashboard,
   Lock,
   Copy,
   Radio,
@@ -393,20 +394,36 @@ export const UserInquiries = () => {
     <div className="h-full flex-1 flex flex-col min-h-0 text-white overflow-hidden select-none">
       <SEO title="Live Concierge & Order Tracking Chat | MS Mobiles" />
 
-      {/* Page Top Breadcrumb */}
-      <div className="flex items-center justify-between gap-4 mb-2 shrink-0 px-1">
-        <div className="flex items-center gap-2 text-xs text-neutral-400">
-          <Link to="/account" className="hover:text-white transition-colors">
-            Account
+      {/* Page Top Bar: Prominent Back to Account & Quick Navigation */}
+      <div className="flex items-center justify-between gap-3 mb-2.5 shrink-0 px-1">
+        <div className="flex items-center gap-2.5">
+          {/* Prominent Back to Account Button */}
+          <Link
+            to="/account"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-dark-900 hover:bg-dark-850 text-neutral-200 hover:text-white text-xs font-bold border border-dark-750 transition-all active:scale-95 shadow-sm group"
+            aria-label="Back to Account Dashboard"
+          >
+            <ArrowLeft className="w-4 h-4 text-accent-400 group-hover:-translate-x-0.5 transition-transform" />
+            <span>Back to Account</span>
           </Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-white font-medium">Conversations & Inquiries</span>
+
+          {/* Breadcrumb trail (Hidden on small mobile) */}
+          <div className="hidden sm:flex items-center gap-2 text-xs text-neutral-400">
+            <ChevronRight className="w-3.5 h-3.5 text-neutral-600" />
+            <span className="text-white font-medium">Inquiries & Support</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
           <Link
+            to="/account/orders"
+            className="hidden sm:inline-flex text-xs text-neutral-400 hover:text-white items-center gap-1 px-3 py-1 rounded-xl hover:bg-dark-900 border border-transparent hover:border-dark-800 transition-colors"
+          >
+            <span>My Orders</span>
+          </Link>
+          <Link
             to="/track"
-            className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 px-3 py-1 rounded-xl bg-dark-900 border border-dark-800 transition-colors"
+            className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-dark-900 border border-dark-800 hover:border-dark-700 transition-colors"
           >
             <Navigation className="w-3.5 h-3.5" />
             <span>Public Route Tracker</span>
@@ -622,16 +639,30 @@ export const UserInquiries = () => {
             }`}
           >
             {/* Conversation Header */}
-            <div className="p-4 border-b border-dark-800/80 bg-dark-900/60 flex items-center justify-between gap-3 shrink-0">
-              <div className="flex items-center gap-3 min-w-0">
-                {/* Mobile Back to List Button */}
-                <button
-                  type="button"
-                  onClick={() => setShowMobileChatView(false)}
-                  className="md:hidden p-1.5 rounded-xl bg-dark-800 text-neutral-300 hover:text-white"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </button>
+            <div className="p-3 sm:p-4 border-b border-dark-800/80 bg-dark-900/90 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                {/* Mobile Back Controls: Back to All Chats & Back to Account */}
+                <div className="md:hidden flex items-center gap-1.5 shrink-0">
+                  {showMobileChatView && (
+                    <button
+                      type="button"
+                      onClick={() => setShowMobileChatView(false)}
+                      aria-label="Back to all chats"
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-dark-800 hover:bg-dark-750 text-white border border-dark-700 text-xs font-bold active:scale-95 transition-all shadow-sm"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>All Chats</span>
+                    </button>
+                  )}
+                  <Link
+                    to="/account"
+                    className="p-1.5 rounded-xl bg-dark-800 hover:bg-dark-750 text-neutral-300 hover:text-white border border-dark-750 active:scale-95 transition-all"
+                    title="Account Dashboard"
+                    aria-label="Account Dashboard"
+                  >
+                    <LayoutDashboard className="w-4 h-4 text-accent-400" />
+                  </Link>
+                </div>
 
                 <div
                   className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white shrink-0 ${

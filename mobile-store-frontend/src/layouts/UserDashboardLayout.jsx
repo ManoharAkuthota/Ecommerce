@@ -53,7 +53,7 @@ const UserDashboardLayout = () => {
   return (
     <div
       className={`${
-        isChatPage ? 'h-screen max-h-screen overflow-hidden' : 'min-h-screen'
+        isChatPage ? 'h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen'
       } bg-dark-950 text-neutral-100 flex flex-col relative`}
     >
       {/* Accessible Skip Link */}
@@ -85,7 +85,7 @@ const UserDashboardLayout = () => {
       {/* 3. Main Content Container */}
       <div
         className={`flex-1 flex flex-col min-w-0 relative z-10 transition-all duration-300 ${
-          isChatPage ? 'h-screen max-h-screen overflow-hidden' : ''
+          isChatPage ? 'h-[100dvh] max-h-[100dvh] overflow-hidden' : ''
         } ${
           isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
         }`}
