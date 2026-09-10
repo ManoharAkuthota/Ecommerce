@@ -101,16 +101,12 @@ axiosClient.interceptors.response.use(
 
     if (status === 401) {
       const url = error?.config?.url || '';
-      // Customer live chat or visitor session errors must not log the admin out!
-      const isCustomerEndpoint =
-        url.includes('/chat/messages') ||
-        url.includes('/chat/read') ||
-        url.includes('/auth/guest-session') ||
-        url.includes('/auth/user-');
+      // Only clear admin session if 401 occurred on an administrative endpoint
+      const isAdminEndpoint = url.includes('/admin/') || url.includes('/admin-');
 
-      if (!isCustomerEndpoint) {
+      if (isAdminEndpoint) {
         if (import.meta?.env?.DEV) {
-          console.warn('[axiosClient] 401 Unauthorized received on admin request. Clearing session and triggering logout.');
+          console.warn('[axiosClient] 401 Unauthorized received on admin request. Clearing admin session.');
         }
         tokenStorage.clearAll();
 
