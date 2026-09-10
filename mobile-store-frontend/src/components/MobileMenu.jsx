@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, ChevronRight, Smartphone, LayoutDashboard, LogOut, User } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useUserAuth } from '../hooks/useUserAuth';
@@ -9,6 +8,7 @@ import Button from './ui/Button';
 /**
  * MobileMenu Component
  * Full-height slide-in navigation drawer from the right for mobile viewports (<768px).
+ * Uses GPU-accelerated CSS transitions to prevent touch freezing or unmount hangs.
  * Closes via backdrop click, link click, or Escape key.
  */
 const MobileMenu = ({
@@ -50,40 +50,34 @@ const MobileMenu = ({
   }, [currentPath]);
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          key="mobile-menu-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
-          onClick={onClose}
-          aria-hidden="true"
-          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[998] md:hidden cursor-pointer"
-        />
-      )}
-      {isOpen && (
-        <motion.aside
-          key="mobile-menu-drawer"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Mobile Navigation Menu"
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-          className="fixed inset-y-0 right-0 z-[999] w-[84%] max-w-[320px] sm:max-w-[360px] h-full bg-dark-950 border-l border-dark-800/80 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none md:hidden"
-        >
-          {/* Top Header */}
-          <div>
-            <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
-              {/* Brand Logo in Menu */}
-              <Link
-                to="/"
-                onClick={onClose}
-                className="flex items-center gap-2 group select-none active:opacity-80"
-              >
+    <>
+      {/* Backdrop overlay */}
+      <div
+        onClick={onClose}
+        aria-hidden="true"
+        className={`fixed inset-0 bg-black/80 backdrop-blur-sm z-[998] md:hidden cursor-pointer transition-opacity duration-300 ease-in-out ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+
+      {/* Slide-in Drawer */}
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile Navigation Menu"
+        className={`fixed inset-y-0 right-0 z-[999] w-[84%] max-w-[320px] sm:max-w-[360px] h-full bg-dark-950 border-l border-dark-800/80 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none md:hidden transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          isOpen ? 'translate-x-0 pointer-events-auto' : 'translate-x-full pointer-events-none'
+        }`}
+      >
+        {/* Top Header */}
+        <div>
+          <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
+            {/* Brand Logo in Menu */}
+            <Link
+              to="/"
+              onClick={onClose}
+              className="flex items-center gap-2 group select-none active:opacity-80"
+            >
                   <div className="p-2 rounded-xl bg-accent-600 text-white shadow-glow-sm">
                     <Smartphone className="w-4 h-4" />
                   </div>
@@ -195,9 +189,8 @@ const MobileMenu = ({
                 Flagship eCommerce Experience
               </p>
             </div>
-          </motion.aside>
-      )}
-    </AnimatePresence>
+          </aside>
+    </>
   );
 };
 

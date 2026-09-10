@@ -8,7 +8,6 @@
 
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
   Smartphone,
@@ -63,31 +62,25 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          key="user-mobile-sidebar-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
-          onClick={onClose}
-          aria-hidden="true"
-          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[998] lg:hidden cursor-pointer"
-        />
-      )}
-      {isOpen && (
-        <motion.aside
-          key="user-mobile-sidebar-drawer"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Customer Mobile Navigation Menu"
-          initial={{ x: '-100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '-100%' }}
-          transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-          className="fixed inset-y-0 left-0 z-[999] w-[84%] max-w-xs h-full bg-dark-900 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-5 overflow-y-auto overscroll-contain select-none lg:hidden"
-        >
+    <>
+      {/* Backdrop Overlay */}
+      <div
+        onClick={onClose}
+        aria-hidden="true"
+        className={`fixed inset-0 bg-black/80 backdrop-blur-sm z-[998] lg:hidden cursor-pointer transition-opacity duration-300 ease-in-out ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+
+      {/* Slide-out Drawer Panel */}
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label="Customer Mobile Navigation Menu"
+        className={`fixed inset-y-0 left-0 z-[999] w-[84%] max-w-xs h-full bg-dark-900 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-5 overflow-y-auto overscroll-contain select-none lg:hidden transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          isOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
+        }`}
+      >
           {/* TOP: Header Branding & Close Button */}
           <div>
             <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
@@ -211,9 +204,8 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
                 label="Sign Out"
               />
             </div>
-          </motion.aside>
-      )}
-    </AnimatePresence>
+          </aside>
+    </>
   );
 };
 
