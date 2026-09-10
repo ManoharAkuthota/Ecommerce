@@ -11,9 +11,24 @@ import axios from 'axios';
 import { tokenStorage } from '../utils/tokenStorage';
 import { isTokenExpired } from '../utils/jwtUtils';
 
-const API_BASE_URL =
+const rawBase =
   (typeof import.meta !== 'undefined' && (import.meta?.env?.VITE_API_BASE_URL || import.meta?.env?.VITE_API_URL)) ||
   'http://localhost:8080/api';
+
+const getNormalizedApiBase = () => {
+  let url = (rawBase || '').trim();
+  if (!url) return 'http://localhost:8080/api';
+  url = url.replace(/\/+$/, '');
+  if (!/^https?:\/\//i.test(url)) {
+    url = `https://${url}`;
+  }
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  return url;
+};
+
+const API_BASE_URL = getNormalizedApiBase();
 
 export const axiosClient = axios.create({
   baseURL: API_BASE_URL,
