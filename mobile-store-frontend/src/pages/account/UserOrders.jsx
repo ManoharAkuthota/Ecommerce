@@ -22,8 +22,10 @@ import {
   Smartphone,
   ChevronRight,
   Search,
+  Star,
 } from 'lucide-react';
 import orderService from '../../services/orderService';
+import WriteReviewModal from '../../components/orders/WriteReviewModal';
 
 const STATUS_BADGES = {
   PENDING: { label: 'Pending Payment', bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400' },
@@ -39,6 +41,7 @@ const UserOrders = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ALL'); // ALL | ACTIVE | DELIVERED | CANCELLED
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedReviewPhone, setSelectedReviewPhone] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -211,9 +214,22 @@ const UserOrders = () => {
                           Qty: {item.quantity} • {item.ram} / {item.storage}
                         </p>
                       </div>
-                      <span className="text-xs font-semibold text-neutral-300">
-                        ₹{item.totalPrice?.toLocaleString('en-IN')}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-semibold text-neutral-300">
+                          ₹{item.totalPrice?.toLocaleString('en-IN')}
+                        </span>
+                        {order.orderStatus !== 'CANCELLED' && (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedReviewPhone(item)}
+                            className="px-2.5 py-1 rounded-lg bg-dark-800 hover:bg-dark-750 text-amber-400 hover:text-amber-300 border border-dark-700/80 hover:border-amber-400/40 text-[11px] font-bold flex items-center gap-1 transition-all shadow-sm"
+                            title="Rate & Review this smartphone"
+                          >
+                            <Star className="w-3 h-3 fill-amber-400" />
+                            <span>Review</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -250,6 +266,13 @@ const UserOrders = () => {
           })}
         </div>
       )}
+
+      {/* Customer Write Review Dialog */}
+      <WriteReviewModal
+        isOpen={Boolean(selectedReviewPhone)}
+        onClose={() => setSelectedReviewPhone(null)}
+        phone={selectedReviewPhone}
+      />
     </div>
   );
 };

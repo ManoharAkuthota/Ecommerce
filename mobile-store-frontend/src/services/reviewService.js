@@ -101,6 +101,23 @@ export const reviewService = {
     const response = await axiosClient.get('/reviews/average');
     return response.data;
   },
+
+  /**
+   * Submit a customer review after purchasing a smartphone
+   * Endpoint: POST /api/reviews
+   * 
+   * @param {Object} reviewData
+   * @param {string} reviewData.customerName
+   * @param {string} [reviewData.customerImage]
+   * @param {string} reviewData.purchasedPhone
+   * @param {number} reviewData.rating (1-5)
+   * @param {string} reviewData.reviewText
+   * @returns {Promise<Object>} ReviewResponse
+   */
+  addReview: async (reviewData) => {
+    const response = await axiosClient.post('/reviews', reviewData);
+    return response.data;
+  },
 };
 
 export default reviewService;

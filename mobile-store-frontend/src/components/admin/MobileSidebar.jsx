@@ -16,6 +16,8 @@ import {
   Package,
   ArrowLeft,
   ShieldCheck,
+  Users,
+  Inbox,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import LogoutButton from './LogoutButton';
@@ -32,6 +34,11 @@ const MENU_ITEMS = [
     icon: Package,
   },
   {
+    name: 'Customers',
+    path: '/admin/users',
+    icon: Users,
+  },
+  {
     name: 'Mobile Devices',
     path: '/admin/mobiles',
     icon: Smartphone,
@@ -40,6 +47,11 @@ const MENU_ITEMS = [
     name: 'Customer Reviews',
     path: '/admin/reviews',
     icon: MessageSquare,
+  },
+  {
+    name: 'Messages & Chat',
+    path: '/admin/messages',
+    icon: Inbox,
   },
 ];
 

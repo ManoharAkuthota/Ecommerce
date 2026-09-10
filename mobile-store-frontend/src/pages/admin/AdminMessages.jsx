@@ -13,6 +13,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
@@ -110,13 +111,18 @@ const formatRelativeSnippetTime = (dateStr) => {
 };
 
 export const AdminMessages = () => {
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const queryCustomerId = searchParams.get('customerId') || location.state?.customer?.customerId || null;
+  const initialCustomerData = location.state?.customer || null;
+
   const [activeTab, setActiveTab] = useState('CHATS'); // 'CHATS' | 'INQUIRIES'
 
   // ==========================================
   // Tab 1: Live Chat State
   // ==========================================
   const [conversations, setConversations] = useState([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(queryCustomerId);
   const [activeChatMessages, setActiveChatMessages] = useState([]);
   const [chatSearch, setChatSearch] = useState('');
   const [chatFilter, setChatFilter] = useState('ALL'); // 'ALL' | 'UNREAD'
@@ -124,7 +130,7 @@ export const AdminMessages = () => {
   const [isSendingReply, setIsSendingReply] = useState(false);
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [isLoadingChat, setIsLoadingChat] = useState(false);
-  const [mobileView, setMobileView] = useState('LIST'); // 'LIST' | 'CHAT' (on mobile)
+  const [mobileView, setMobileView] = useState(queryCustomerId ? 'CHAT' : 'LIST'); // 'LIST' | 'CHAT' (on mobile)
 
   // Scroll and view refs
   const chatContainerRef = useRef(null);
@@ -221,11 +227,29 @@ export const AdminMessages = () => {
     if (!isSilent) setIsLoadingConversations(true);
     try {
       const data = await chatService.getAdminConversations();
-      const list = Array.isArray(data) ? data : [];
+      let list = Array.isArray(data) ? [...data] : [];
+
+      // If queryCustomerId exists, ensure they appear in conversations list
+      if (queryCustomerId && !list.some((c) => c.customerId === queryCustomerId)) {
+        list.unshift({
+          customerId: queryCustomerId,
+          customerName: initialCustomerData?.customerName || 'Customer',
+          customerEmail: initialCustomerData?.customerEmail || '',
+          customerPhone: initialCustomerData?.customerPhone || '',
+          customerAvatar: initialCustomerData?.customerAvatar || null,
+          lastMessage: 'Customer selected — ready for live concierge',
+          lastSenderRole: 'CUSTOMER',
+          lastMessageTime: new Date().toISOString(),
+          unreadCount: 0,
+        });
+      }
+
       setConversations(list);
 
-      // Auto-select first customer on initial load if none selected yet
-      if (!selectedCustomerIdRef.current && list.length > 0) {
+      // Auto-select queryCustomerId if provided, else first customer on initial load if none selected yet
+      if (queryCustomerId) {
+        setSelectedCustomerId(queryCustomerId);
+      } else if (!selectedCustomerIdRef.current && list.length > 0) {
         setSelectedCustomerId(list[0].customerId);
       }
     } catch (err) {
@@ -234,7 +258,7 @@ export const AdminMessages = () => {
     } finally {
       if (!isSilent) setIsLoadingConversations(false);
     }
-  }, [showToast]);
+  }, [showToast, queryCustomerId, initialCustomerData]);
 
   // Load chat thread for selected customer (with scroll protection)
   const loadCustomerChat = useCallback(async (customerId, isSilent = false) => {
@@ -318,6 +342,18 @@ export const AdminMessages = () => {
   useEffect(() => {
     fetchConversations(false);
   }, [fetchConversations]);
+
+  // Handle external customer selection navigation (e.g. from AdminUsers directory)
+  useEffect(() => {
+    if (queryCustomerId) {
+      setSelectedCustomerId(queryCustomerId);
+      setMobileView('CHAT');
+      loadCustomerChat(queryCustomerId, false);
+      setTimeout(() => {
+        textareaRef.current?.focus({ preventScroll: true });
+      }, 200);
+    }
+  }, [queryCustomerId, loadCustomerChat]);
 
   // When selectedCustomerId changes on initial auto-select, trigger load
   useEffect(() => {

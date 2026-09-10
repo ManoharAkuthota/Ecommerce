@@ -19,6 +19,7 @@ import {
   MessageSquare,
   Inbox,
   Package,
+  Users,
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
@@ -36,6 +37,12 @@ const MENU_ITEMS = [
     name: 'Orders',
     path: '/admin/orders',
     icon: Package,
+    badge: null,
+  },
+  {
+    name: 'Customers',
+    path: '/admin/users',
+    icon: Users,
     badge: null,
   },
   {

@@ -59,6 +59,7 @@ const EditMobile = lazy(() => import('../pages/admin/EditMobile'));
 const AdminOrders = lazy(() => import('../pages/admin/AdminOrders'));
 const ReviewManagement = lazy(() => import('../pages/admin/ReviewManagement'));
 const AdminMessages = lazy(() => import('../pages/admin/AdminMessages'));
+const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
 
 /**
  * Public Only Route Guard (Admin)
@@ -188,6 +189,7 @@ const AppRoutes = () => {
             <Route path="orders" element={<AdminOrders />} />
             <Route path="reviews" element={<ReviewManagement />} />
             <Route path="messages" element={<AdminMessages />} />
+            <Route path="users" element={<AdminUsers />} />
           </Route>
         </Route>
       </Routes>

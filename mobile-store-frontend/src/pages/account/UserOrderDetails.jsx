@@ -29,12 +29,14 @@ import {
   Phone,
   Mail,
   MapPin,
+  Star,
 } from 'lucide-react';
 import orderService from '../../services/orderService';
 import { useToast } from '../../context/ToastContext';
 import TrackingRouteMap from '../../components/order/TrackingRouteMap';
 import TrackingTimeline from '../../components/order/TrackingTimeline';
 import DeliveryAgentCard from '../../components/order/DeliveryAgentCard';
+import WriteReviewModal from '../../components/orders/WriteReviewModal';
 
 const TIMELINE_STAGES = [
   { key: 'CONFIRMED', label: 'Order Placed', desc: 'Order verified & inventory reserved' },
@@ -53,6 +55,7 @@ const UserOrderDetails = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
+  const [selectedReviewPhone, setSelectedReviewPhone] = useState(null);
 
   useEffect(() => {
     fetchOrder();
@@ -272,9 +275,22 @@ const UserOrderDetails = () => {
                 </div>
               </div>
 
-              <span className="text-sm sm:text-base font-extrabold text-white shrink-0">
-                ₹{item.totalPrice?.toLocaleString('en-IN')}
-              </span>
+              <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                <span className="text-sm sm:text-base font-extrabold text-white">
+                  ₹{item.totalPrice?.toLocaleString('en-IN')}
+                </span>
+                {!isCancelled && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedReviewPhone(item)}
+                    className="px-3 py-1.5 rounded-xl bg-dark-800 hover:bg-dark-750 text-amber-400 hover:text-amber-300 border border-dark-700/80 hover:border-amber-400/40 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                  >
+                    <Star className="w-3.5 h-3.5 fill-amber-400" />
+                    <span className="hidden sm:inline">Write Review</span>
+                    <span className="sm:hidden">Review</span>
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -396,6 +412,13 @@ const UserOrderDetails = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Customer Write Review Dialog */}
+      <WriteReviewModal
+        isOpen={Boolean(selectedReviewPhone)}
+        onClose={() => setSelectedReviewPhone(null)}
+        phone={selectedReviewPhone}
+      />
     </div>
   );
 };
