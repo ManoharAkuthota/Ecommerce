@@ -61,23 +61,12 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
   const drawerVariants = {
     closed: {
       x: '-100%',
-      transition: { type: 'spring', stiffness: 350, damping: 35 },
+      transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] },
     },
     open: {
       x: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 30,
-        staggerChildren: 0.05,
-        delayChildren: 0.08,
-      },
+      transition: { duration: 0.24, ease: [0.32, 0.72, 0, 1] },
     },
-  };
-
-  const itemVariants = {
-    closed: { opacity: 0, x: -16 },
-    open: { opacity: 1, x: 0, transition: { duration: 0.2 } },
   };
 
   const displayName = user?.fullName || 'Customer';
@@ -87,19 +76,23 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          {/* Backdrop Overlay */}
+        <div className="fixed inset-0 z-50 lg:hidden overflow-hidden touch-manipulation">
+          {/* Backdrop Overlay - Explicitly behind the drawer with z-40 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.18 }}
             onClick={onClose}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              onClose();
+            }}
             aria-hidden="true"
-            className="fixed inset-0 bg-dark-950/80 backdrop-blur-md"
+            className="fixed inset-0 bg-black/75 cursor-pointer z-40"
           />
 
-          {/* Slide-out Drawer Panel */}
+          {/* Slide-out Drawer Panel - Explicitly fixed with z-50 above backdrop */}
           <motion.aside
             variants={drawerVariants}
             initial="closed"
@@ -108,15 +101,15 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
             role="dialog"
             aria-modal="true"
             aria-label="Customer Mobile Navigation Menu"
-            className="relative z-10 w-4/5 max-w-xs h-full bg-dark-900 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-5 overflow-y-auto"
+            className="fixed inset-y-0 left-0 z-50 w-[84%] max-w-xs h-full bg-dark-900 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-5 overflow-y-auto overscroll-contain touch-manipulation select-none"
           >
             {/* TOP: Header Branding & Close Button */}
             <div>
-              <div className="flex items-center justify-between pb-6 border-b border-dark-800/80">
+              <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
                 <Link
                   to="/account"
                   onClick={onClose}
-                  className="flex items-center gap-3 overflow-hidden"
+                  className="flex items-center gap-3 overflow-hidden active:opacity-80"
                 >
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-accent-600 via-sky-500 to-indigo-500 flex items-center justify-center text-white shadow-glow-sm flex-shrink-0">
                     <Smartphone className="w-5 h-5" />
@@ -134,8 +127,12 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={onClose}
+                  onTouchEnd={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
                   aria-label="Close mobile navigation menu"
-                  className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-800 border border-dark-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 transition-colors"
+                  className="p-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-800 border border-dark-800 focus:outline-none transition-colors active:bg-dark-750 active:scale-95 touch-manipulation"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -165,8 +162,8 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
               </div>
 
               {/* Navigation Links */}
-              <nav className="mt-5 space-y-1.5" aria-label="Customer Mobile Links">
-                <div className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
+              <nav className="mt-4 space-y-1" aria-label="Customer Mobile Links">
+                <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
                   Navigation
                 </div>
 
@@ -177,41 +174,40 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
                     : location.pathname.startsWith(item.path);
 
                   return (
-                    <motion.div key={item.path} variants={itemVariants}>
-                      <Link
-                        to={item.path}
-                        onClick={onClose}
-                        className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                          isActive
-                            ? 'bg-accent-600/15 text-accent-400 border border-accent-500/30 shadow-glow-sm font-semibold'
-                            : 'text-neutral-300 hover:text-white hover:bg-dark-800/60 border border-transparent'
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={onClose}
+                      className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-sm font-medium transition-all active:scale-[0.98] touch-manipulation ${
+                        isActive
+                          ? 'bg-accent-600/20 text-accent-400 border border-accent-500/30 shadow-glow-sm font-semibold'
+                          : 'text-neutral-300 hover:text-white hover:bg-dark-800/60 border border-transparent active:bg-dark-800'
+                      }`}
+                    >
+                      <Icon
+                        className={`w-5 h-5 flex-shrink-0 ${
+                          isActive ? 'text-accent-400' : 'text-neutral-400'
                         }`}
-                      >
-                        <Icon
-                          className={`w-5 h-5 flex-shrink-0 ${
-                            isActive ? 'text-accent-400' : 'text-neutral-400'
-                          }`}
-                        />
-                        <span className="truncate">{item.name}</span>
-                        {item.badge && (
-                          <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent-500/20 text-accent-300">
-                            {item.badge}
-                          </span>
-                        )}
-                      </Link>
-                    </motion.div>
+                      />
+                      <span className="truncate">{item.name}</span>
+                      {item.badge && (
+                        <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent-500/20 text-accent-300">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
                   );
                 })}
               </nav>
             </div>
 
             {/* BOTTOM: Storefront Return & Logout Button */}
-            <div className="pt-4 border-t border-dark-800/80 space-y-3">
-              <div className="space-y-1.5">
+            <div className="pt-4 border-t border-dark-800/80 space-y-2.5">
+              <div className="space-y-1">
                 <Link
                   to="/"
                   onClick={onClose}
-                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-medium text-neutral-400 hover:text-white hover:bg-dark-800/60 border border-dark-800 transition-colors"
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-medium text-neutral-400 hover:text-white hover:bg-dark-800/60 border border-dark-800 transition-colors active:scale-[0.98] touch-manipulation"
                 >
                   <ArrowLeft className="w-4 h-4 text-neutral-400" />
                   <span>Store Main Page</span>
@@ -220,7 +216,7 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
                 <Link
                   to="/about"
                   onClick={onClose}
-                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-medium text-neutral-400 hover:text-white hover:bg-dark-800/60 border border-dark-800 transition-colors"
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-medium text-neutral-400 hover:text-white hover:bg-dark-800/60 border border-dark-800 transition-colors active:scale-[0.98] touch-manipulation"
                 >
                   <Info className="w-4 h-4 text-neutral-400" />
                   <span>About Store Details</span>

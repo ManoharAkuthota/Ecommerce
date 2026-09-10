@@ -48,49 +48,34 @@ const MobileMenu = ({
   const drawerVariants = {
     closed: {
       x: '100%',
-      transition: {
-        type: 'spring',
-        stiffness: 350,
-        damping: 35,
-      },
+      transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] },
     },
     open: {
       x: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 30,
-        staggerChildren: 0.06,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    closed: { opacity: 0, x: 20 },
-    open: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.25, ease: 'easeOut' },
+      transition: { duration: 0.24, ease: [0.32, 0.72, 0, 1] },
     },
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex justify-end">
-          {/* Backdrop overlay */}
+        <div className="fixed inset-0 z-50 md:hidden overflow-hidden touch-manipulation">
+          {/* Backdrop overlay - Explicitly behind the drawer with z-40 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.18 }}
             onClick={onClose}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              onClose();
+            }}
             aria-hidden="true"
-            className="fixed inset-0 bg-black/65 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/75 cursor-pointer z-40"
           />
 
-          {/* Slide-in Drawer */}
+          {/* Slide-in Drawer - Explicitly fixed with z-50 above backdrop */}
           <motion.aside
             role="dialog"
             aria-modal="true"
@@ -99,16 +84,16 @@ const MobileMenu = ({
             initial="closed"
             animate="open"
             exit="closed"
-            className="relative w-full max-w-[320px] sm:max-w-[360px] h-full bg-dark-950/95 border-l border-dark-800/80 shadow-2xl backdrop-blur-2xl flex flex-col justify-between p-6 z-10 overflow-y-auto"
+            className="fixed inset-y-0 right-0 z-50 w-[84%] max-w-[320px] sm:max-w-[360px] h-full bg-dark-950 border-l border-dark-800/80 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none touch-manipulation"
           >
             {/* Top Header */}
             <div>
-              <div className="flex items-center justify-between pb-6 border-b border-dark-800/80">
+              <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
                 {/* Brand Logo in Menu */}
                 <Link
                   to="/"
                   onClick={onClose}
-                  className="flex items-center gap-2 group select-none"
+                  className="flex items-center gap-2 group select-none active:opacity-80"
                 >
                   <div className="p-2 rounded-xl bg-accent-600 text-white shadow-glow-sm">
                     <Smartphone className="w-4 h-4" />
@@ -122,15 +107,19 @@ const MobileMenu = ({
                 <button
                   type="button"
                   onClick={onClose}
+                  onTouchEnd={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
                   aria-label="Close navigation menu"
-                  className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-900 border border-dark-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
+                  className="p-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-900 border border-dark-800 transition-colors active:bg-dark-800 active:scale-95 touch-manipulation focus:outline-none"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Navigation Links */}
-              <nav className="mt-6 space-y-1.5" aria-label="Mobile Secondary Navigation">
+              <nav className="mt-5 space-y-1" aria-label="Mobile Secondary Navigation">
                 {navLinks.map((link) => {
                   const isActive =
                     link.path === '/'
@@ -138,24 +127,23 @@ const MobileMenu = ({
                       : currentPath.startsWith(link.path);
 
                   return (
-                    <motion.div key={link.path} variants={itemVariants}>
-                      <Link
-                        to={link.path}
-                        onClick={onClose}
-                        className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 ${
-                          isActive
-                            ? 'text-white bg-accent-600/15 border border-accent-500/30 text-accent-300'
-                            : 'text-neutral-300 hover:text-white hover:bg-dark-900/80'
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      onClick={onClose}
+                      className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] touch-manipulation ${
+                        isActive
+                          ? 'text-white bg-accent-600/20 border border-accent-500/30 text-accent-300 shadow-glow-sm'
+                          : 'text-neutral-300 hover:text-white hover:bg-dark-900/80 active:bg-dark-900'
+                      }`}
+                    >
+                      <span>{link.name}</span>
+                      <ChevronRight
+                        className={`w-4 h-4 transition-transform duration-200 ${
+                          isActive ? 'text-accent-400 translate-x-0.5' : 'text-neutral-600'
                         }`}
-                      >
-                        <span>{link.name}</span>
-                        <ChevronRight
-                          className={`w-4 h-4 transition-transform duration-200 ${
-                            isActive ? 'text-accent-400 translate-x-0.5' : 'text-neutral-600'
-                          }`}
-                        />
-                      </Link>
-                    </motion.div>
+                      />
+                    </Link>
                   );
                 })}
               </nav>

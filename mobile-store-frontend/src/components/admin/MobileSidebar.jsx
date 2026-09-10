@@ -79,41 +79,34 @@ const MobileSidebar = ({ isOpen, onClose }) => {
   const drawerVariants = {
     closed: {
       x: '-100%',
-      transition: { type: 'spring', stiffness: 350, damping: 35 },
+      transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] },
     },
     open: {
       x: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 30,
-        staggerChildren: 0.05,
-        delayChildren: 0.08,
-      },
+      transition: { duration: 0.24, ease: [0.32, 0.72, 0, 1] },
     },
-  };
-
-  const itemVariants = {
-    closed: { opacity: 0, x: -16 },
-    open: { opacity: 1, x: 0, transition: { duration: 0.2 } },
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          {/* Backdrop Overlay */}
+        <div className="fixed inset-0 z-50 lg:hidden overflow-hidden touch-manipulation">
+          {/* Backdrop Overlay - Explicitly behind the drawer with z-40 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.18 }}
             onClick={onClose}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              onClose();
+            }}
             aria-hidden="true"
-            className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/75 cursor-pointer z-40"
           />
 
-          {/* Slide-in Drawer Container */}
+          {/* Slide-in Drawer Container - Explicitly fixed with z-50 above backdrop */}
           <motion.aside
             role="dialog"
             aria-modal="true"
@@ -122,15 +115,15 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             initial="closed"
             animate="open"
             exit="closed"
-            className="relative w-full max-w-[300px] h-full bg-dark-950/95 border-r border-dark-800/80 shadow-2xl backdrop-blur-2xl flex flex-col justify-between p-6 z-10 overflow-y-auto select-none"
+            className="fixed inset-y-0 left-0 z-50 w-[84%] max-w-[300px] h-full bg-dark-950 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none touch-manipulation"
           >
             {/* TOP: Header Branding & Close Button */}
             <div>
-              <div className="flex items-center justify-between pb-6 border-b border-dark-800/80">
+              <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
                 <Link
                   to="/admin/dashboard"
                   onClick={onClose}
-                  className="flex items-center gap-2.5"
+                  className="flex items-center gap-2.5 active:opacity-80"
                 >
                   <div className="p-2 rounded-xl bg-gradient-to-tr from-accent-600 to-indigo-500 text-white shadow-glow-sm">
                     <Smartphone className="w-5 h-5" />
@@ -148,16 +141,20 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={onClose}
+                  onTouchEnd={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
                   aria-label="Close navigation drawer"
-                  className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-900 border border-dark-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
+                  className="p-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-dark-900 border border-dark-800 transition-colors active:bg-dark-800 active:scale-95 touch-manipulation focus:outline-none"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Navigation Links */}
-              <nav className="mt-6 space-y-1.5" aria-label="Mobile Drawer Navigation">
-                <div className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
+              <nav className="mt-5 space-y-1" aria-label="Mobile Drawer Navigation">
+                <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-neutral-500">
                   Navigation
                 </div>
 
@@ -166,32 +163,31 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                   const isActive = location.pathname.startsWith(item.path);
 
                   return (
-                    <motion.div key={item.path} variants={itemVariants}>
-                      <Link
-                        to={item.path}
-                        onClick={onClose}
-                        className={`flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-semibold tracking-wide transition-all duration-200 ${
-                          isActive
-                            ? 'bg-accent-600/15 text-accent-300 border border-accent-500/30 shadow-glow-sm shadow-accent-950/40'
-                            : 'text-neutral-400 hover:text-white hover:bg-dark-900 border border-transparent'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Icon
-                            className={`w-4 h-4 ${
-                              isActive ? 'text-accent-400' : 'text-neutral-500'
-                            }`}
-                          />
-                          <span>{item.name}</span>
-                        </div>
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={onClose}
+                      className={`flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-semibold tracking-wide transition-all active:scale-[0.98] touch-manipulation ${
+                        isActive
+                          ? 'bg-accent-600/20 text-accent-300 border border-accent-500/30 shadow-glow-sm shadow-accent-950/40'
+                          : 'text-neutral-400 hover:text-white hover:bg-dark-900 border border-transparent active:bg-dark-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon
+                          className={`w-4 h-4 ${
+                            isActive ? 'text-accent-400' : 'text-neutral-500'
+                          }`}
+                        />
+                        <span>{item.name}</span>
+                      </div>
 
-                        {item.badge && (
-                          <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-accent-500/10 text-accent-400 border border-accent-500/20">
-                            {item.badge}
-                          </span>
-                        )}
-                      </Link>
-                    </motion.div>
+                      {item.badge && (
+                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-accent-500/10 text-accent-400 border border-accent-500/20">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
                   );
                 })}
               </nav>
