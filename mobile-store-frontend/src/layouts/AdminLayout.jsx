@@ -43,7 +43,7 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-950 text-neutral-100 flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-dark-950 text-neutral-100 flex flex-col relative">
       {/* Accessible Skip Link */}
       <a
         href="#admin-main-content"
@@ -79,8 +79,8 @@ const AdminLayout = () => {
         {/* Dynamic Header */}
         <Header onOpenMobileMenu={() => setIsMobileOpen(true)} />
 
-        {/* Page Content Outlet */}
-        <main id="admin-main-content" tabIndex="-1" className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full mx-auto focus:outline-none">
+        {/* Page Content Outlet - Unified document scroll on mobile to prevent touch freeze */}
+        <main id="admin-main-content" tabIndex="-1" className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto focus:outline-none">
           <Outlet />
         </main>
       </div>

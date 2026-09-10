@@ -60,10 +60,12 @@ export const DashboardLiveOrderTracking = () => {
   useEffect(() => {
     fetchLatestOrder();
 
-    // Auto-refresh order telemetry every 15s for live status updates
+    // Auto-refresh order telemetry every 45s only while tab is active to preserve mobile resources
     pollIntervalRef.current = setInterval(() => {
-      fetchLatestOrder(true);
-    }, 15000);
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchLatestOrder(true);
+      }
+    }, 45000);
 
     return () => {
       if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);

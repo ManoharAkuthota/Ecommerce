@@ -49,7 +49,7 @@ const UserDashboardLayout = () => {
     <div
       className={`${
         isChatPage ? 'h-screen max-h-screen overflow-hidden' : 'min-h-screen'
-      } bg-dark-950 text-neutral-100 flex flex-col relative overflow-x-hidden`}
+      } bg-dark-950 text-neutral-100 flex flex-col relative`}
     >
       {/* Accessible Skip Link */}
       <a
@@ -88,14 +88,14 @@ const UserDashboardLayout = () => {
         {/* Dynamic Header */}
         <UserHeader onOpenMobileMenu={() => setIsMobileOpen(true)} />
 
-        {/* Page Content Outlet */}
+        {/* Page Content Outlet - Unified document scroll on mobile to prevent touch freeze */}
         <main
           id="user-main-content"
           tabIndex="-1"
           className={`flex-1 min-h-0 ${
             isChatPage
               ? 'p-2 sm:p-3 lg:p-4 overflow-hidden flex flex-col'
-              : 'p-4 sm:p-6 lg:p-8 overflow-y-auto'
+              : 'p-4 sm:p-6 lg:p-8'
           } max-w-7xl w-full mx-auto focus:outline-none`}
         >
           <Outlet />

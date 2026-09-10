@@ -6,8 +6,10 @@
   color-scheme: dark;
 }
 
-html {
-  scroll-behavior: smooth;
+html,
+body {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {

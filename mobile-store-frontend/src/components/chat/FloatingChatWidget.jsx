@@ -277,15 +277,14 @@ export const FloatingChatWidget = () => {
     }
   }, [isOpen, activeChannel, messages.length, isLoadingChat, scrollToBottom]);
 
-  // Real-time polling
+  // Real-time polling - ONLY poll while widget is open to prevent mobile CPU/network contention
   useEffect(() => {
-    if (!hasStartedSession) return;
+    if (!isOpen || !hasStartedSession) return;
 
-    // Fast 2s polling when open, slower 8s polling when closed
-    const intervalTime = isOpen ? 2000 : 8000;
+    // 3s interval while user is actively in the chat drawer
     const interval = setInterval(() => {
       fetchMessages(true);
-    }, intervalTime);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [isOpen, hasStartedSession, fetchMessages]);
