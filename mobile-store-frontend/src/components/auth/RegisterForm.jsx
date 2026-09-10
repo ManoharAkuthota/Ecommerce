@@ -55,7 +55,7 @@ const RegisterForm = () => {
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
 
-  const { register } = useUserAuth();
+  const { register, login } = useUserAuth();
   const navigate = useNavigate();
 
   // Automatic redirect timer upon registration success
@@ -64,8 +64,8 @@ const RegisterForm = () => {
     if (registrationSuccess && countdown > 0) {
       timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
     } else if (registrationSuccess && countdown === 0) {
-      navigate('/login', {
-        state: { message: 'Account created successfully. Please sign in.' },
+      navigate('/account', {
+        state: { message: 'Account created successfully! Welcome to MS Mobiles.' },
       });
     }
     return () => clearTimeout(timer);
@@ -152,6 +152,13 @@ const RegisterForm = () => {
         phoneNumber: phoneNumber.trim(),
       });
 
+      // Auto login so customer is instantly authenticated
+      try {
+        await login({ email: email.trim(), password });
+      } catch (loginErr) {
+        console.warn('Auto-login deferred:', loginErr);
+      }
+
       setRegistrationSuccess(true);
     } catch (err) {
       const message =
@@ -185,12 +192,12 @@ const RegisterForm = () => {
             <span className="text-white font-semibold">{fullName}</span>.
           </p>
           <p className="text-xs text-neutral-400 mt-1">
-            Your customer profile is active and ready.
+            Your customer profile is active and saved permanently in the cloud.
           </p>
         </div>
 
         <div className="p-4 rounded-2xl bg-dark-950/60 border border-dark-800 text-xs text-neutral-300 flex items-center justify-between">
-          <span>Redirecting to sign in...</span>
+          <span>Entering your account...</span>
           <span className="font-mono font-bold text-accent-400">
             {countdown}s
           </span>
@@ -200,11 +207,11 @@ const RegisterForm = () => {
           variant="primary"
           size="md"
           fullWidth
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/account')}
           icon={<ArrowRight className="w-4 h-4" />}
           iconPosition="right"
         >
-          Sign In Now
+          Go to My Account
         </Button>
       </motion.div>
     );
@@ -317,6 +324,7 @@ const RegisterForm = () => {
             }}
             disabled={isSubmitting}
             error={errors.password}
+            helperText={!errors.password && !password ? "At least 8 chars, 1 uppercase, 1 lowercase, 1 number & 1 special symbol (e.g. Pass@123)" : undefined}
             required
             autoComplete="new-password"
             iconLeft={<Lock className="w-4 h-4" />}
