@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { X, ShieldCheck, ChevronRight, Smartphone, LayoutDashboard, LogOut, User } from 'lucide-react';
+import { X, ShieldCheck, ChevronRight, Smartphone, LayoutDashboard, LogOut, User, Bell } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useUserAuth } from '../hooks/useUserAuth';
+import { useNotificationBadge } from '../hooks/useNotificationBadge';
 import Button from './ui/Button';
 
 /**
@@ -19,6 +20,7 @@ const MobileMenu = ({
 }) => {
   const { isAuthenticated, logout } = useAuth();
   const { isAuthenticated: isCustomerAuth, user: customerUser, logout: customerLogout } = useUserAuth();
+  const { unreadCount } = useNotificationBadge();
 
   // Close menu on Escape key press
   useEffect(() => {
@@ -153,6 +155,21 @@ const MobileMenu = ({
                     >
                       My Account ({customerUser?.fullName?.split(' ')[0] || 'Customer'})
                     </Button>
+                  </Link>
+                  <Link
+                    to="/account/notifications"
+                    onClick={onClose}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-dark-900 border border-dark-800 text-xs font-semibold text-neutral-200 hover:text-white transition-colors active:scale-[0.98]"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Bell className="w-4 h-4 text-accent-400" />
+                      <span>Notifications & Alerts</span>
+                    </div>
+                    {unreadCount > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-accent-500/20 text-accent-300 border border-accent-500/30">
+                        {unreadCount} new
+                      </span>
+                    )}
                   </Link>
                 </div>
               )}

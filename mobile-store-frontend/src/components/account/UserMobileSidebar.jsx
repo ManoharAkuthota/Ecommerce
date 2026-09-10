@@ -22,11 +22,13 @@ import {
   Info,
 } from 'lucide-react';
 import { useUserAuth } from '../../hooks/useUserAuth';
+import { useNotificationBadge } from '../../hooks/useNotificationBadge';
 import UserLogoutButton from './UserLogoutButton';
 import { USER_NAV_ITEMS } from './UserSidebar';
 
 const UserMobileSidebar = ({ isOpen, onClose }) => {
   const { user } = useUserAuth();
+  const { unreadCount } = useNotificationBadge();
   const location = useLocation();
 
   // Close drawer on Escape key
@@ -147,6 +149,11 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
                     ? location.pathname === item.path
                     : location.pathname.startsWith(item.path);
 
+                  const itemBadge =
+                    item.path === '/account/notifications' && unreadCount > 0
+                      ? `${unreadCount} new`
+                      : item.badge;
+
                   return (
                     <Link
                       key={item.path}
@@ -164,9 +171,9 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
                         }`}
                       />
                       <span className="truncate">{item.name}</span>
-                      {item.badge && (
+                      {itemBadge && (
                         <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent-500/20 text-accent-300">
-                          {item.badge}
+                          {itemBadge}
                         </span>
                       )}
                     </Link>

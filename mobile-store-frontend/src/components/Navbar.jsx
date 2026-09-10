@@ -10,6 +10,7 @@ import { useCart } from '../hooks/useCart';
 import Container from './ui/Container';
 import NavLinkItem from './NavLinkItem';
 import MobileMenu from './MobileMenu';
+import NotificationBell from './common/NotificationBell';
 
 /**
  * Premium Responsive Navbar
@@ -199,8 +200,8 @@ const Navbar = () => {
                 <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
               </button>
 
-              {/* Wishlist Link & Live Animated Badge */}
-              <Link to="/account/wishlist" className="relative inline-flex items-center">
+              {/* Wishlist Link & Live Animated Badge (Desktop / Tablet) */}
+              <Link to="/account/wishlist" className="relative hidden sm:inline-flex items-center">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -226,8 +227,8 @@ const Navbar = () => {
                 </motion.button>
               </Link>
 
-              {/* Compare Link & Live Animated Badge */}
-              <Link to="/compare" className="relative inline-flex items-center">
+              {/* Compare Link & Live Animated Badge (Desktop / Tablet) */}
+              <Link to="/compare" className="relative hidden sm:inline-flex items-center">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -253,7 +254,10 @@ const Navbar = () => {
                 </motion.button>
               </Link>
 
-              {/* Shopping Cart Button & Live Counter Badge */}
+              {/* Notification Bell with Live Unread Dot / Counter Badge (Mobile & Desktop) */}
+              <NotificationBell isScrolled={isScrolled} />
+
+              {/* Shopping Cart Button & Live Counter Badge (Mobile & Desktop) */}
               <motion.button
                 type="button"
                 whileHover={{ scale: 1.05 }}
@@ -280,7 +284,7 @@ const Navbar = () => {
                 )}
               </motion.button>
 
-              {/* Live Store Concierge Chat Trigger */}
+              {/* Live Store Concierge Chat Trigger (Desktop / Tablet) */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -288,7 +292,7 @@ const Navbar = () => {
                 onClick={() => window.dispatchEvent(new CustomEvent('toggle-concierge-chat'))}
                 title="Open Live Store Concierge Chat"
                 aria-label="Chat with store concierge"
-                className={`relative p-2 sm:p-2.5 rounded-full sm:rounded-xl border transition-all duration-200 select-none ${
+                className={`relative hidden sm:inline-flex p-2 sm:p-2.5 rounded-full sm:rounded-xl border transition-all duration-200 select-none ${
                   isScrolled
                     ? 'text-neutral-700 hover:text-cyan-600 hover:bg-neutral-100/80 border-neutral-200/80'
                     : 'text-neutral-300 hover:text-cyan-400 hover:bg-dark-850/60 border-dark-800/80'

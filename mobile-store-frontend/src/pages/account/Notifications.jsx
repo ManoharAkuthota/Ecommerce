@@ -38,25 +38,16 @@ import { Button, Card } from '../../components/ui';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import contactService from '../../services/contactService';
 import orderService from '../../services/orderService';
+import notificationService from '../../services/notificationService';
 import SEO from '../../components/common/SEO';
-
-const NOTIFICATIONS_STORAGE_KEY = 'ms_user_read_notifications';
 
 export const Notifications = () => {
   const { user } = useUserAuth();
 
   const [inquiries, setInquiries] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [readIds, setReadIds] = useState(() => {
-    try {
-      const raw = window.localStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [dismissedIds, setDismissedIds] = useState([]);
+  const [readIds, setReadIds] = useState(() => notificationService.getReadIds());
+  const [dismissedIds, setDismissedIds] = useState(() => notificationService.getDismissedIds());
   const [selectedFilter, setSelectedFilter] = useState('ALL');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -88,24 +79,19 @@ export const Notifications = () => {
 
   // Persist read notification IDs
   const markAsRead = (id) => {
-    if (readIds.includes(id)) return;
-    const updated = [...readIds, id];
-    setReadIds(updated);
-    try {
-      window.localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(updated));
-    } catch {}
+    notificationService.markAsRead(id);
+    setReadIds(notificationService.getReadIds());
   };
 
   const markAllAsRead = () => {
     const allIds = rawNotifications.map((n) => n.id);
-    setReadIds(allIds);
-    try {
-      window.localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(allIds));
-    } catch {}
+    notificationService.markAllAsRead(allIds);
+    setReadIds(notificationService.getReadIds());
   };
 
   const dismissNotification = (id) => {
-    setDismissedIds((prev) => [...prev, id]);
+    notificationService.dismissNotification(id);
+    setDismissedIds(notificationService.getDismissedIds());
   };
 
   // Build aggregated notification items

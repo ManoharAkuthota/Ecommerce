@@ -16,6 +16,7 @@ import { Menu, ExternalLink, User, ShieldCheck } from 'lucide-react';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import UserBreadcrumb from './UserBreadcrumb';
 import UserLogoutButton from './UserLogoutButton';
+import NotificationBell from '../common/NotificationBell';
 
 const ACCOUNT_TITLES = {
   account: 'Account Dashboard',
@@ -75,6 +76,9 @@ const UserHeader = ({ onOpenMobileMenu }) => {
             <span>Store Main Page</span>
             <ExternalLink className="w-3.5 h-3.5 text-neutral-500" />
           </Link>
+
+          {/* Customer Notification Bell (Visible on Mobile & Desktop) */}
+          <NotificationBell />
 
           {/* Customer Identity Card */}
           <div className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-dark-800/80">

@@ -13,6 +13,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNotificationBadge } from '../../hooks/useNotificationBadge';
 import {
   LayoutDashboard,
   User,
@@ -91,6 +92,7 @@ export const USER_NAV_ITEMS = [
 
 const UserSidebar = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
+  const { unreadCount } = useNotificationBadge();
 
   return (
     <motion.aside
@@ -143,6 +145,11 @@ const UserSidebar = ({ isCollapsed, onToggleCollapse }) => {
               ? location.pathname === item.path
               : location.pathname.startsWith(item.path);
 
+            const itemBadge =
+              item.path === '/account/notifications' && unreadCount > 0
+                ? `${unreadCount} new`
+                : item.badge;
+
             return (
               <Link
                 key={item.path}
@@ -186,9 +193,9 @@ const UserSidebar = ({ isCollapsed, onToggleCollapse }) => {
                   </AnimatePresence>
 
                   {/* Badge support */}
-                  {item.badge && !isCollapsed && (
+                  {itemBadge && !isCollapsed && (
                     <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-accent-500/20 text-accent-300">
-                      {item.badge}
+                      {itemBadge}
                     </span>
                   )}
                 </div>
