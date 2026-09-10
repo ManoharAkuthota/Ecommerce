@@ -1,0 +1,17 @@
+# ==============================================================================
+# MS Mobiles — Robots Exclusion File
+# ==============================================================================
+
+User-agent: *
+Allow: /
+Allow: /mobiles
+Allow: /mobiles/*
+Allow: /contact
+
+# Disallow indexing of private admin console and auth pages
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /api/admin/*
+
+# Sitemap Location
+Sitemap: https://msmobiles.com/sitemap.xml
