@@ -82,12 +82,12 @@ const Header = ({ onOpenMobileMenu }) => {
               {initials || <User className="w-4 h-4" />}
             </div>
 
-            {/* Admin Details (Hidden on small mobile) */}
-            <div className="hidden sm:flex flex-col text-left">
-              <span className="text-xs font-bold text-white leading-tight truncate max-w-[130px]">
+            {/* Admin Details (Always visible on mobile & desktop) */}
+            <div className="flex flex-col text-left min-w-0">
+              <span className="text-xs font-bold text-white leading-tight truncate max-w-[85px] xs:max-w-[110px] sm:max-w-[140px]">
                 {adminName}
               </span>
-              <span className="text-[10px] font-semibold text-accent-400 uppercase tracking-wider flex items-center gap-1">
+              <span className="hidden sm:flex text-[10px] font-semibold text-accent-400 uppercase tracking-wider items-center gap-1">
                 <ShieldCheck className="w-2.5 h-2.5" />
                 Super Admin
               </span>

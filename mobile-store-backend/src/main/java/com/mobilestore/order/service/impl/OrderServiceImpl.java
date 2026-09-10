@@ -398,28 +398,34 @@ public class OrderServiceImpl implements OrderService {
                 ? " (Carrier: " + (updated.getCarrier() != null && !updated.getCarrier().isBlank() ? updated.getCarrier() : "Blue Dart Express") + " | AWB: " + updated.getTrackingNumber() + ")"
                 : "";
 
+        String itemsSummary = (updated.getItems() != null && !updated.getItems().isEmpty())
+                ? updated.getItems().stream()
+                        .map(i -> i.getQuantity() + "x " + i.getMobileName())
+                        .collect(Collectors.joining(", "))
+                : "items";
+
         String stageTitle;
         String stageDesc;
         switch (updated.getOrderStatus()) {
             case PROCESSING:
                 stageTitle = "⚙️ Order Update: #" + updated.getOrderNumber() + " is now PROCESSING";
-                stageDesc = "Quality inspection passed and IMEI numbers verified. Sealed in tamper-evident security packaging at Cyber Hills Fulfillment Center.";
+                stageDesc = "Quality inspection passed and IMEI numbers verified for " + itemsSummary + ". Sealed in tamper-evident security packaging at Cyber Hills Fulfillment Center.";
                 break;
             case SHIPPED:
                 stageTitle = "🚚 Order Dispatched: #" + updated.getOrderNumber() + " is IN TRANSIT";
-                stageDesc = "Handed over to logistics carrier" + trackingInfo + ". Please keep your 4-digit Delivery Handover OTP ready for courier verification.";
+                stageDesc = itemsSummary + " handed over to logistics carrier" + trackingInfo + ". Please keep your 4-digit Delivery Handover OTP ready for courier verification.";
                 break;
             case DELIVERED:
                 stageTitle = "✅ Order Delivered: #" + updated.getOrderNumber() + " DELIVERED";
-                stageDesc = "Package successfully delivered to " + updated.getRecipientName() + ". Handover OTP verified. Official 1-Year brand warranty is now active!";
+                stageDesc = itemsSummary + " successfully delivered to " + updated.getRecipientName() + ". Handover OTP verified. Official 1-Year brand warranty is now active!";
                 break;
             case CANCELLED:
                 stageTitle = "❌ Order Cancelled: #" + updated.getOrderNumber() + " CANCELLED";
-                stageDesc = "Order cancellation completed. Any pre-authorized charges will be refunded to your original payment method within 3-5 business days.";
+                stageDesc = "Order cancellation completed for " + itemsSummary + ". Any pre-authorized charges will be refunded to your original payment method within 3-5 business days.";
                 break;
             default:
                 stageTitle = "📋 Order Milestone: #" + updated.getOrderNumber() + " updated to " + updated.getOrderStatus();
-                stageDesc = "Order status updated in our fulfillment network.";
+                stageDesc = "Order status for " + itemsSummary + " updated in our fulfillment network.";
                 break;
         }
         postOrderNotificationToChat(updated, stageTitle, stageDesc);

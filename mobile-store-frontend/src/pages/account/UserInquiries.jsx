@@ -801,13 +801,20 @@ export const UserInquiries = () => {
                           <div className="max-w-md w-full rounded-2xl bg-dark-900 border border-cyan-500/40 p-4 shadow-glow-sm space-y-3">
                             <div className="flex items-center justify-between border-b border-dark-800 pb-2">
                               <div className="flex items-center gap-2">
-                                <Truck className="w-4 h-4 text-cyan-400" />
-                                <span className="text-xs font-black text-white font-mono">
-                                  #{milestone.orderNumber || 'MS-2026-ORDER'}
-                                </span>
+                                <div className="p-1 rounded-lg bg-cyan-500/10 text-cyan-400 shrink-0">
+                                  <Truck className="w-3.5 h-3.5" />
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-xs font-black text-white font-mono">
+                                    #{milestone.orderNumber || 'MS-2026-ORDER'}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-cyan-400">
+                                    • {msg.senderName || 'MS Logistics Bot'}
+                                  </span>
+                                </div>
                               </div>
                               <span
-                                className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold ${
+                                className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold shrink-0 ${
                                   milestone.stage === 'DELIVERED'
                                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                                     : milestone.stage === 'SHIPPED'

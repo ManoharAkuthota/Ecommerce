@@ -80,8 +80,12 @@ const UserHeader = ({ onOpenMobileMenu }) => {
           {/* Customer Notification Bell (Visible on Mobile & Desktop) */}
           <NotificationBell />
 
-          {/* Customer Identity Card */}
-          <div className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-dark-800/80">
+          {/* Customer Identity Card (Visible on Mobile & Desktop) */}
+          <Link
+            to="/account/profile"
+            title="View Profile"
+            className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-dark-800/80 hover:opacity-90 transition-opacity"
+          >
             {/* Avatar Badge */}
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-accent-600 via-sky-500 to-indigo-500 overflow-hidden flex items-center justify-center text-white text-xs font-extrabold shadow-glow-sm flex-shrink-0">
               {user?.profileImage ? (
@@ -95,17 +99,17 @@ const UserHeader = ({ onOpenMobileMenu }) => {
               )}
             </div>
 
-            {/* Customer Details (Hidden on small mobile) */}
-            <div className="hidden sm:flex flex-col text-left">
-              <span className="text-xs font-bold text-white leading-tight truncate max-w-[130px]">
+            {/* Customer Details (Always visible on mobile & desktop) */}
+            <div className="flex flex-col text-left min-w-0">
+              <span className="text-xs font-bold text-white leading-tight truncate max-w-[85px] xs:max-w-[110px] sm:max-w-[140px]">
                 {displayName}
               </span>
-              <span className="text-[10px] font-semibold text-accent-400 uppercase tracking-wider flex items-center gap-1">
+              <span className="hidden sm:flex text-[10px] font-semibold text-accent-400 uppercase tracking-wider items-center gap-1">
                 <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
                 Customer
               </span>
             </div>
-          </div>
+          </Link>
 
           {/* Logout Action */}
           <UserLogoutButton
