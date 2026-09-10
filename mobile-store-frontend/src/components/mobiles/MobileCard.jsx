@@ -17,6 +17,7 @@ import { Cpu, HardDrive, ArrowRight, Smartphone, ShoppingBag } from 'lucide-reac
 import WishlistHeartButton from '../wishlist/WishlistHeartButton';
 import CompareAddButton from '../compare/CompareAddButton';
 import { useCart } from '../../hooks/useCart';
+import { getOptimizedImageUrl } from '../../utils/imageOptimizer';
 
 export const StockBadge = ({ status }) => {
   const statusMap = {
@@ -81,12 +82,13 @@ export const MobileCard = ({ mobile }) => {
     stockStatus = 'IN_STOCK',
   } = mobile;
 
-  // Primary image extractor
-  const imageUrl =
+  // Primary image extractor with mobile bandwidth optimization
+  const rawImageUrl =
     mobile.imageUrls?.[0] ||
     mobile.images?.[0]?.imageUrl ||
     mobile.image ||
     null;
+  const imageUrl = getOptimizedImageUrl(rawImageUrl, 420);
 
   const displayPrice = formatPrice(price, formattedPrice);
   const targetUrl = id ? `/mobiles/${id}` : '/mobiles';

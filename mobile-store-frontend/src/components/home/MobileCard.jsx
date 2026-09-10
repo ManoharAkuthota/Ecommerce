@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom';
 import { Cpu, HardDrive, ArrowRight, Smartphone, Sparkles } from 'lucide-react';
 import WishlistHeartButton from '../wishlist/WishlistHeartButton';
 import CompareAddButton from '../compare/CompareAddButton';
+import { getOptimizedImageUrl } from '../../utils/imageOptimizer';
 
 export const StockBadge = ({ status }) => {
   const statusMap = {
@@ -80,12 +81,13 @@ export const MobileCard = ({ mobile }) => {
     stockStatus = 'IN_STOCK',
   } = mobile;
 
-  // Extract primary image URL
-  const imageUrl =
+  // Extract primary image URL with mobile optimization
+  const rawImageUrl =
     mobile.imageUrls?.[0] ||
     mobile.images?.[0]?.imageUrl ||
     mobile.image ||
     null;
+  const imageUrl = getOptimizedImageUrl(rawImageUrl, 420);
 
   const displayPrice = formatPrice(price, formattedPrice);
   const targetUrl = id ? `/mobiles/${id}` : '/mobiles';
