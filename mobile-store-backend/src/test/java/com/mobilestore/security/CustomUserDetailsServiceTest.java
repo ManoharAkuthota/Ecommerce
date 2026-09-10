@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
+import com.mobilestore.user.repository.UserRepository;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,6 +25,9 @@ class CustomUserDetailsServiceTest {
 
     @Mock
     private AdminRepository adminRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private CustomUserDetailsService customUserDetailsService;
@@ -61,10 +65,13 @@ class CustomUserDetailsServiceTest {
     void shouldThrowWhenAdminNotFound() {
         when(adminRepository.findByEmailIgnoreCase(anyString()))
                 .thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(anyString()))
+                .thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () ->
                 customUserDetailsService.loadUserByUsername("unknown@antigravity.com")
         );
         verify(adminRepository, times(1)).findByEmailIgnoreCase("unknown@antigravity.com");
+        verify(userRepository, times(1)).findByEmailIgnoreCase("unknown@antigravity.com");
     }
 }

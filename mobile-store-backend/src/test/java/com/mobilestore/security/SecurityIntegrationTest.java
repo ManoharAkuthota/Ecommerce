@@ -33,6 +33,9 @@ class SecurityIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private com.mobilestore.mobile.repository.MobileRepository mobileRepository;
+
     private String generateExpiredToken(String username) {
         return Jwts.builder()
                 .subject(username)
@@ -164,12 +167,13 @@ class SecurityIntegrationTest {
         String adminToken = jwtService.generateToken("admin@antigravity.com");
         UpdateVisibilityRequest request = new UpdateVisibilityRequest(false);
 
-        mockMvc.perform(patch("/api/mobiles/a0000000-0000-0000-0000-000000000001/visibility")
+        java.util.UUID mobileId = mobileRepository.findAll().get(0).getId();
+        mockMvc.perform(patch("/api/mobiles/" + mobileId + "/visibility")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("a0000000-0000-0000-0000-000000000001"))
+                .andExpect(jsonPath("$.id").value(mobileId.toString()))
                 .andExpect(jsonPath("$.hidden").value(false));
     }
 

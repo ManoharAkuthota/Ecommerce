@@ -14,11 +14,11 @@ services:
       - key: SERVER_PORT
         value: 8080
       - key: DB_URL
-        value: jdbc:h2:file:/app/data/mobilestore;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+        value: jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/mobile_store?useSSL=true&sslMode=VERIFY_IDENTITY&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - key: DB_USERNAME
-        value: sa
+        value: 3HVUhdVZBhSBCPs.root
       - key: DB_PASSWORD
-        value: ""
+        value: 6BP74bdgTlFpWzrm
       - key: JWT_SECRET
         value: antigravity_mobile_store_super_secret_jwt_key_2026_production_grade_token_signing_secret
       - key: CLOUDINARY_CLOUD_NAME

@@ -29,6 +29,9 @@ class AdminLoginIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private com.mobilestore.mobile.repository.MobileRepository mobileRepository;
+
     @Test
     @DisplayName("POST /api/admin/login with valid credentials should return 200 and valid JWT")
     void validLoginReturns200AndToken() throws Exception {
@@ -52,13 +55,14 @@ class AdminLoginIntegrationTest {
         assertFalse(response.getToken().isBlank());
 
         // Verify the emitted token can access protected endpoints
+        java.util.UUID mobileId = mobileRepository.findAll().get(0).getId();
         UpdateVisibilityRequest visRequest = new UpdateVisibilityRequest(false);
-        mockMvc.perform(patch("/api/mobiles/a0000000-0000-0000-0000-000000000001/visibility")
+        mockMvc.perform(patch("/api/mobiles/" + mobileId + "/visibility")
                         .header("Authorization", "Bearer " + response.getToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(visRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("a0000000-0000-0000-0000-000000000001"));
+                .andExpect(jsonPath("$.id").value(mobileId.toString()));
     }
 
     @Test

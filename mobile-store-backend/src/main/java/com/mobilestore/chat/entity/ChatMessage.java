@@ -45,7 +45,7 @@ public class ChatMessage {
 
     @NotNull(message = "Customer user is required")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, columnDefinition = "VARCHAR(36) COLLATE utf8mb4_unicode_ci")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @NotBlank(message = "Sender role is required")
