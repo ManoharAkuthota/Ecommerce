@@ -37,6 +37,7 @@ import TrackingRouteMap from '../../components/order/TrackingRouteMap';
 import TrackingTimeline from '../../components/order/TrackingTimeline';
 import DeliveryAgentCard from '../../components/order/DeliveryAgentCard';
 import WriteReviewModal from '../../components/orders/WriteReviewModal';
+import TaxInvoiceModal from '../../components/order/TaxInvoiceModal';
 
 const TIMELINE_STAGES = [
   { key: 'CONFIRMED', label: 'Order Placed', desc: 'Order verified & inventory reserved' },
@@ -53,6 +54,7 @@ const UserOrderDetails = () => {
   const [order, setOrder] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
   const [selectedReviewPhone, setSelectedReviewPhone] = useState(null);
@@ -141,11 +143,11 @@ const UserOrderDetails = () => {
 
           <button
             type="button"
-            onClick={() => window.print()}
-            className="px-4 py-2 rounded-xl bg-dark-900 border border-dark-800 hover:bg-dark-800 text-neutral-200 text-xs font-semibold flex items-center gap-2 transition-colors"
+            onClick={() => setShowInvoiceModal(true)}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-glow-sm"
           >
             <Printer className="w-3.5 h-3.5" />
-            Print Tax Invoice
+            <span>📄 Official GST Tax Invoice</span>
           </button>
 
           {canCancel && (
@@ -418,6 +420,13 @@ const UserOrderDetails = () => {
         isOpen={Boolean(selectedReviewPhone)}
         onClose={() => setSelectedReviewPhone(null)}
         phone={selectedReviewPhone}
+      />
+
+      {/* Official PDF GST Tax Invoice Modal */}
+      <TaxInvoiceModal
+        isOpen={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        order={order}
       />
     </div>
   );

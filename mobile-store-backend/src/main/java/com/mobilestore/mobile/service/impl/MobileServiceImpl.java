@@ -41,18 +41,21 @@ public class MobileServiceImpl implements MobileService {
     private final MobileRepository mobileRepository;
     private final MobileImageRepository mobileImageRepository;
     private final com.mobilestore.mobile.service.CloudinaryService cloudinaryService;
+    private final com.mobilestore.stockalert.service.StockAlertService stockAlertService;
 
     /**
-     * Constructor injection for required repositories and CloudinaryService.
+     * Constructor injection for required repositories, CloudinaryService, and StockAlertService.
      */
     public MobileServiceImpl(
             MobileRepository mobileRepository,
             MobileImageRepository mobileImageRepository,
-            com.mobilestore.mobile.service.CloudinaryService cloudinaryService
+            com.mobilestore.mobile.service.CloudinaryService cloudinaryService,
+            com.mobilestore.stockalert.service.StockAlertService stockAlertService
     ) {
         this.mobileRepository = mobileRepository;
         this.mobileImageRepository = mobileImageRepository;
         this.cloudinaryService = cloudinaryService;
+        this.stockAlertService = stockAlertService;
     }
 
     @Override
@@ -285,6 +288,15 @@ public class MobileServiceImpl implements MobileService {
 
         log.info("Stock status updated for mobile ID: {} | Old Status: '{}' -> New Status: '{}'",
                 id, oldStatus, stockStatus);
+
+        // If transitioning from OUT_OF_STOCK to IN_STOCK or LIMITED_STOCK, trigger subscriber alert notifications
+        if (oldStatus == StockStatus.OUT_OF_STOCK && (stockStatus == StockStatus.IN_STOCK || stockStatus == StockStatus.LIMITED_STOCK)) {
+            try {
+                stockAlertService.notifySubscribers(saved);
+            } catch (Exception ex) {
+                log.warn("Failed to dispatch restock notifications for mobile ID [{}]: {}", id, ex.getMessage());
+            }
+        }
 
         return mapToResponse(saved);
     }

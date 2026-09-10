@@ -26,9 +26,12 @@ import {
   Calendar,
   DollarSign,
   Building2,
+  FileText,
+  Printer,
 } from 'lucide-react';
 import orderService from '../../services/orderService';
 import { useToast } from '../../context/ToastContext';
+import TaxInvoiceModal from '../../components/order/TaxInvoiceModal';
 
 const STATUS_BADGES = {
   PENDING: { label: 'Pending Payment', bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400' },
@@ -57,6 +60,7 @@ const AdminOrders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [invoiceOrder, setInvoiceOrder] = useState(null);
 
   // Status update form state
   const [statusForm, setStatusForm] = useState({
@@ -97,6 +101,20 @@ const AdminOrders = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     fetchOrdersAndMetrics();
+  };
+
+  const handleOpenInvoice = async (order) => {
+    if (!order.items || order.items.length === 0) {
+      try {
+        const fullOrder = await orderService.getAdminOrderById(order.id);
+        setInvoiceOrder(fullOrder || order);
+      } catch (err) {
+        console.error('Failed to load full order for invoice:', err);
+        setInvoiceOrder(order);
+      }
+    } else {
+      setInvoiceOrder(order);
+    }
   };
 
   const openStatusModal = (order) => {
@@ -348,14 +366,26 @@ const AdminOrders = () => {
 
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() => openStatusModal(order)}
-                          className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 text-white font-semibold text-xs border border-dark-700 flex items-center gap-1.5 ml-auto transition-colors"
-                        >
-                          <Edit3 className="w-3 h-3 text-accent-400" />
-                          Update Status
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenInvoice(order)}
+                            className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold text-xs flex items-center gap-1.5 transition-colors"
+                            title="Generate & Download GST Tax Invoice"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Tax Invoice</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => openStatusModal(order)}
+                            className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 text-white font-semibold text-xs border border-dark-700 flex items-center gap-1.5 transition-colors"
+                          >
+                            <Edit3 className="w-3 h-3 text-accent-400" />
+                            Update Status
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -478,27 +508,48 @@ const AdminOrders = () => {
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-dark-800">
+                <div className="flex items-center justify-between gap-2.5 pt-3 border-t border-dark-800">
                   <button
                     type="button"
-                    onClick={() => setShowStatusModal(false)}
-                    className="px-4 py-2 rounded-xl text-neutral-400 hover:text-white text-xs font-semibold"
+                    onClick={() => {
+                      setShowStatusModal(false);
+                      handleOpenInvoice(selectedOrder);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
                   >
-                    Cancel
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>View Tax Invoice</span>
                   </button>
-                  <button
-                    type="submit"
-                    disabled={isUpdating}
-                    className="px-5 py-2 rounded-xl bg-accent-600 hover:bg-accent-500 text-white text-xs font-bold transition-all shadow-glow-sm disabled:opacity-50"
-                  >
-                    {isUpdating ? 'Saving...' : 'Save & Notify Customer'}
-                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowStatusModal(false)}
+                      className="px-4 py-2 rounded-xl text-neutral-400 hover:text-white text-xs font-semibold"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isUpdating}
+                      className="px-5 py-2 rounded-xl bg-accent-600 hover:bg-accent-500 text-white text-xs font-bold transition-all shadow-glow-sm disabled:opacity-50"
+                    >
+                      {isUpdating ? 'Saving...' : 'Save & Notify Customer'}
+                    </button>
+                  </div>
                 </div>
               </form>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+
+      {/* Official PDF GST Tax Invoice Modal */}
+      <TaxInvoiceModal
+        isOpen={Boolean(invoiceOrder)}
+        onClose={() => setInvoiceOrder(null)}
+        order={invoiceOrder}
+      />
     </div>
   );
 };

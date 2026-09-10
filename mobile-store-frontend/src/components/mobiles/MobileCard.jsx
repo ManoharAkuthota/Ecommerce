@@ -13,9 +13,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Cpu, HardDrive, ArrowRight, Smartphone, ShoppingBag } from 'lucide-react';
+import { Cpu, HardDrive, ArrowRight, Smartphone, ShoppingBag, Bell } from 'lucide-react';
 import WishlistHeartButton from '../wishlist/WishlistHeartButton';
 import CompareAddButton from '../compare/CompareAddButton';
+import StockAlertModal from './StockAlertModal';
 import { useCart } from '../../hooks/useCart';
 import { getOptimizedImageUrl } from '../../utils/imageOptimizer';
 
@@ -66,6 +67,7 @@ export const formatPrice = (price, formattedPrice) => {
 
 export const MobileCard = ({ mobile }) => {
   const [imageError, setImageError] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
   const { addToCart } = useCart();
 
   if (!mobile) return null;
@@ -196,19 +198,35 @@ export const MobileCard = ({ mobile }) => {
           </div>
 
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                addToCart(mobile, 1, true, true);
-              }}
-              title="Add to Bag"
-              aria-label={`Add ${name} to shopping bag`}
-              className="p-2 rounded-xl text-neutral-300 hover:text-white bg-dark-800 hover:bg-accent-600 border border-dark-700/80 hover:border-accent-500 transition-all duration-200"
-            >
-              <ShoppingBag className="w-4 h-4" />
-            </button>
+            {stockStatus === 'OUT_OF_STOCK' ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowAlertModal(true);
+                }}
+                title="Notify Me When Available"
+                aria-label={`Notify when ${name} is in stock`}
+                className="p-2 rounded-xl text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 hover:border-rose-400 transition-all duration-200"
+              >
+                <Bell className="w-4 h-4 animate-pulse" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  addToCart(mobile, 1, true, true);
+                }}
+                title="Add to Bag"
+                aria-label={`Add ${name} to shopping bag`}
+                className="p-2 rounded-xl text-neutral-300 hover:text-white bg-dark-800 hover:bg-accent-600 border border-dark-700/80 hover:border-accent-500 transition-all duration-200"
+              >
+                <ShoppingBag className="w-4 h-4" />
+              </button>
+            )}
 
             <Link
               to={targetUrl}
@@ -222,6 +240,13 @@ export const MobileCard = ({ mobile }) => {
           </div>
         </div>
       </div>
+
+      {/* Out of stock alert subscription modal */}
+      <StockAlertModal
+        isOpen={showAlertModal}
+        onClose={() => setShowAlertModal(false)}
+        mobile={mobile}
+      />
     </motion.div>
   );
 };

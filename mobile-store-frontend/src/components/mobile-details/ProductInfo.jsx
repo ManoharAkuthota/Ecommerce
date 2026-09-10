@@ -26,10 +26,12 @@ import {
   Plus,
   Minus,
   Zap,
+  Bell,
 } from 'lucide-react';
 import StockBadge from './StockBadge';
 import WishlistHeartButton from '../wishlist/WishlistHeartButton';
 import CompareAddButton from '../compare/CompareAddButton';
+import StockAlertModal from '../mobiles/StockAlertModal';
 import { useCart } from '../../hooks/useCart';
 
 export const formatPrice = (price, formattedPrice) => {
@@ -52,6 +54,7 @@ export const ProductInfo = ({ mobile, className = '' }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [showStockAlertModal, setShowStockAlertModal] = useState(false);
 
   const {
     brand = 'Flagship',
@@ -225,13 +228,24 @@ export const ProductInfo = ({ mobile, className = '' }) => {
             </button>
           </>
         ) : (
-          <div className="p-4 rounded-2xl bg-dark-900 border border-dark-800 text-center">
-            <span className="text-xs text-rose-400 font-bold block mb-1">
-              Currently Out of Stock
-            </span>
-            <p className="text-[11px] text-neutral-400">
-              This flagship device is awaiting restock. Inquire with store team below.
-            </p>
+          <div className="p-5 rounded-2xl bg-dark-900 border border-dark-800 text-center space-y-3">
+            <div>
+              <span className="text-xs text-rose-400 font-bold block mb-1">
+                Currently Out of Stock
+              </span>
+              <p className="text-[11px] text-neutral-400">
+                This flagship model is awaiting restock. Register for priority VIP notification!
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowStockAlertModal(true)}
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-accent-600 to-indigo-600 hover:from-accent-500 hover:to-indigo-500 text-white text-xs font-bold shadow-glow-sm hover:shadow-glow-md transition-all duration-200"
+            >
+              <Bell className="w-4 h-4" />
+              <span>Notify Me When Available</span>
+            </button>
           </div>
         )}
 
@@ -256,6 +270,13 @@ export const ProductInfo = ({ mobile, className = '' }) => {
           <span className="text-neutral-300">Express Insured Dispatch with White-Glove Handling</span>
         </div>
       </div>
+
+      {/* Stock Restock Alert Modal */}
+      <StockAlertModal
+        isOpen={showStockAlertModal}
+        onClose={() => setShowStockAlertModal(false)}
+        mobile={mobile}
+      />
     </div>
   );
 };

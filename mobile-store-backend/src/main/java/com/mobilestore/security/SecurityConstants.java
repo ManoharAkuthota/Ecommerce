@@ -32,6 +32,7 @@ public final class SecurityConstants {
             "/api/admin/login",
             "/api/auth/login",
             "/api/auth/register",
-            "/api/orders/coupon/validate"
+            "/api/orders/coupon/validate",
+            "/api/stock-alerts"
     };
 }
