@@ -49,57 +49,41 @@ const MobileMenu = ({
     onClose();
   }, [currentPath]);
 
-  // Drawer animation variants
-  const drawerVariants = {
-    closed: {
-      x: '100%',
-      transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] },
-    },
-    open: {
-      x: 0,
-      transition: { duration: 0.24, ease: [0.32, 0.72, 0, 1] },
-    },
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          key="mobile-menu-root"
+          key="mobile-menu-backdrop"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 md:hidden overflow-hidden"
+          transition={{ duration: 0.18 }}
+          onClick={onClose}
+          aria-hidden="true"
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[998] md:hidden cursor-pointer"
+        />
+      )}
+      {isOpen && (
+        <motion.aside
+          key="mobile-menu-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Navigation Menu"
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+          className="fixed inset-y-0 right-0 z-[999] w-[84%] max-w-[320px] sm:max-w-[360px] h-full bg-dark-950 border-l border-dark-800/80 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none md:hidden"
         >
-          {/* Backdrop overlay */}
-          <div
-            onClick={onClose}
-            aria-hidden="true"
-            className="fixed inset-0 bg-black/75 cursor-pointer z-40 transition-opacity"
-          />
-
-          {/* Slide-in Drawer - Explicitly fixed with z-50 above backdrop */}
-          <motion.aside
-            key="mobile-menu-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile Navigation Menu"
-            variants={drawerVariants}
-            initial="closed"
-            animate="open"
-            exit="closed"
-            className="fixed inset-y-0 right-0 z-50 w-[84%] max-w-[320px] sm:max-w-[360px] h-full bg-dark-950 border-l border-dark-800/80 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none touch-manipulation"
-          >
-            {/* Top Header */}
-            <div>
-              <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
-                {/* Brand Logo in Menu */}
-                <Link
-                  to="/"
-                  onClick={onClose}
-                  className="flex items-center gap-2 group select-none active:opacity-80"
-                >
+          {/* Top Header */}
+          <div>
+            <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
+              {/* Brand Logo in Menu */}
+              <Link
+                to="/"
+                onClick={onClose}
+                className="flex items-center gap-2 group select-none active:opacity-80"
+              >
                   <div className="p-2 rounded-xl bg-accent-600 text-white shadow-glow-sm">
                     <Smartphone className="w-4 h-4" />
                   </div>
@@ -212,7 +196,6 @@ const MobileMenu = ({
               </p>
             </div>
           </motion.aside>
-        </motion.div>
       )}
     </AnimatePresence>
   );

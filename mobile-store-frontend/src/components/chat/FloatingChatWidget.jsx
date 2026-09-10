@@ -402,7 +402,7 @@ export const FloatingChatWidget = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="fixed bottom-6 right-6 z-50 select-none"
+            className="fixed bottom-6 right-6 z-40 select-none"
           >
             <motion.button
               whileHover={{ scale: 1.05, y: -2 }}

@@ -76,52 +76,37 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     onClose();
   }, [location.pathname]);
 
-  const drawerVariants = {
-    closed: {
-      x: '-100%',
-      transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] },
-    },
-    open: {
-      x: 0,
-      transition: { duration: 0.24, ease: [0.32, 0.72, 0, 1] },
-    },
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          key="admin-mobile-sidebar-root"
+          key="admin-mobile-sidebar-backdrop"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 lg:hidden overflow-hidden"
+          transition={{ duration: 0.18 }}
+          onClick={onClose}
+          aria-hidden="true"
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[998] lg:hidden cursor-pointer"
+        />
+      )}
+      {isOpen && (
+        <motion.aside
+          key="admin-mobile-sidebar-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Navigation Menu"
+          initial={{ x: '-100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '-100%' }}
+          transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+          className="fixed inset-y-0 left-0 z-[999] w-[84%] max-w-[300px] h-full bg-dark-950 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none lg:hidden"
         >
-          {/* Backdrop Overlay */}
-          <div
-            onClick={onClose}
-            aria-hidden="true"
-            className="fixed inset-0 bg-black/75 cursor-pointer z-40 transition-opacity"
-          />
-
-          {/* Slide-in Drawer Container - Explicitly fixed with z-50 above backdrop */}
-          <motion.aside
-            key="admin-mobile-sidebar-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile Navigation Menu"
-            variants={drawerVariants}
-            initial="closed"
-            animate="open"
-            exit="closed"
-            className="fixed inset-y-0 left-0 z-50 w-[84%] max-w-[300px] h-full bg-dark-950 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto overscroll-contain select-none"
-          >
-            {/* TOP: Header Branding & Close Button */}
-            <div>
-              <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
-                <Link
-                  to="/admin/dashboard"
+          {/* TOP: Header Branding & Close Button */}
+          <div>
+            <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
+              <Link
+                to="/admin/dashboard"
                   onClick={onClose}
                   className="flex items-center gap-2.5 active:opacity-80"
                 >
@@ -225,7 +210,6 @@ const MobileSidebar = ({ isOpen, onClose }) => {
               />
             </div>
           </motion.aside>
-        </motion.div>
       )}
     </AnimatePresence>
   );

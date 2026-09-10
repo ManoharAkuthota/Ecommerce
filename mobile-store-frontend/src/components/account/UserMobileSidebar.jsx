@@ -58,17 +58,6 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
     onClose();
   }, [location.pathname]);
 
-  const drawerVariants = {
-    closed: {
-      x: '-100%',
-      transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] },
-    },
-    open: {
-      x: 0,
-      transition: { duration: 0.24, ease: [0.32, 0.72, 0, 1] },
-    },
-  };
-
   const displayName = user?.fullName || 'Customer';
   const displayEmail = user?.email || '';
   const initial = displayName.charAt(0).toUpperCase();
@@ -77,37 +66,33 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          key="user-mobile-sidebar-root"
+          key="user-mobile-sidebar-backdrop"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 lg:hidden overflow-hidden"
+          transition={{ duration: 0.18 }}
+          onClick={onClose}
+          aria-hidden="true"
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[998] lg:hidden cursor-pointer"
+        />
+      )}
+      {isOpen && (
+        <motion.aside
+          key="user-mobile-sidebar-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Customer Mobile Navigation Menu"
+          initial={{ x: '-100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '-100%' }}
+          transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+          className="fixed inset-y-0 left-0 z-[999] w-[84%] max-w-xs h-full bg-dark-900 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-5 overflow-y-auto overscroll-contain select-none lg:hidden"
         >
-          {/* Backdrop Overlay */}
-          <div
-            onClick={onClose}
-            aria-hidden="true"
-            className="fixed inset-0 bg-black/75 cursor-pointer z-40 transition-opacity"
-          />
-
-          {/* Slide-out Drawer Panel */}
-          <motion.aside
-            key="user-mobile-sidebar-drawer"
-            variants={drawerVariants}
-            initial="closed"
-            animate="open"
-            exit="closed"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Customer Mobile Navigation Menu"
-            className="fixed inset-y-0 left-0 z-50 w-[84%] max-w-xs h-full bg-dark-900 border-r border-dark-800 shadow-2xl flex flex-col justify-between p-5 overflow-y-auto overscroll-contain select-none"
-          >
-            {/* TOP: Header Branding & Close Button */}
-            <div>
-              <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
-                <Link
-                  to="/account"
+          {/* TOP: Header Branding & Close Button */}
+          <div>
+            <div className="flex items-center justify-between pb-5 border-b border-dark-800/80">
+              <Link
+                to="/account"
                   onClick={onClose}
                   className="flex items-center gap-3 overflow-hidden active:opacity-80"
                 >
@@ -227,7 +212,6 @@ const UserMobileSidebar = ({ isOpen, onClose }) => {
               />
             </div>
           </motion.aside>
-        </motion.div>
       )}
     </AnimatePresence>
   );
