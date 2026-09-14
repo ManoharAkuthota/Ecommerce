@@ -16,10 +16,22 @@ const getEffectiveApiBase = () => {
   if (envUrl && envUrl.trim() && !envUrl.includes('localhost')) {
     return envUrl.trim();
   }
-  // If running in browser on cloud (Render / Vercel / Netlify / custom domain)
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    // 1. If running on localhost or loopback
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:8080/api';
+    }
+    // 2. If accessed via mobile phone on local Wi-Fi / LAN (e.g. 192.168.x.x, 10.x.x.x, 172.x.x.x, or .local)
+    const isLocalNetwork = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname.endsWith('.local');
+    if (isLocalNetwork) {
+      return `http://${hostname}:8080/api`;
+    }
+    // 3. Cloud production deployments (Vercel, Netlify, Render, custom domains)
     return 'https://ms-mobiles-backend.onrender.com/api';
   }
+
   return envUrl || 'http://localhost:8080/api';
 };
 
