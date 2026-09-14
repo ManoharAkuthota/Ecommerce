@@ -1,0 +1,21 @@
+﻿{
+  "appId": "com.mobilestore.app",
+  "appName": "MS Mobiles",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "cleartext": true,
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#020617",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "backgroundColor": "#020617",
+      "style": "DARK"
+    }
+  }
+}

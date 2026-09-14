@@ -2,16 +2,20 @@
   "short_name": "MS Mobiles",
   "name": "MS Mobiles — Flagship Smartphones",
   "description": "Luxury mobile eCommerce store featuring flagship smartphones, verified hardware specs, and official concierge support.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "categories": ["shopping", "technology"],
   "icons": [
     {
       "src": "/favicon.svg",
       "type": "image/svg+xml",
-      "sizes": "64x64 128x128 256x256"
+      "sizes": "64x64 128x128 256x256 512x512",
+      "purpose": "any maskable"
     }
-  ],
-  "start_url": "/",
-  "background_color": "#020617",
-  "theme_color": "#020617",
-  "display": "standalone",
-  "orientation": "portrait"
+  ]
 }
